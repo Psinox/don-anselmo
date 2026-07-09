@@ -41,6 +41,33 @@ async function _fetch(method, path, body) {
   return res.json();
 }
 
+/* ---------- migracion desde claves viejas de localStorage ---------- */
+
+function _migrarDesdeViejo() {
+  const cached = _readCache();
+  if (cached && cached.productos) return cached; /* ya migrado */
+
+  try {
+    const prod = localStorage.getItem("donanselmo_productos");
+    const ban = localStorage.getItem("donanselmo_banners");
+    const set = localStorage.getItem("donanselmo_settings");
+    const pres = localStorage.getItem("donanselmo_presupuestos") || "[]";
+    const mpen = localStorage.getItem("donanselmo_mayoristas_pendientes") || "[]";
+    const mapr = localStorage.getItem("donanselmo_mayoristas_aprobados") || "[]";
+
+    if (!prod && !ban && !set) return null; /* no hay datos viejos */
+
+    return {
+      productos: prod ? JSON.parse(prod) : [],
+      banners: ban ? JSON.parse(ban) : [],
+      settings: set ? JSON.parse(set) : {},
+      presupuestos: JSON.parse(pres),
+      solicitudesMayoristas: JSON.parse(mpen),
+      mayoristasAprobados: JSON.parse(mapr),
+    };
+  } catch { return null; }
+}
+
 /* ---------- inicializacion ---------- */
 
 async function cloudInit(seedData) {
@@ -52,7 +79,8 @@ async function cloudInit(seedData) {
       _ready = true;
       return true;
     }
-    const base = seedData || _readCache() || {};
+    const migrado = _migrarDesdeViejo();
+    const base = migrado || seedData || _readCache() || {};
     const seedRes = await _fetch("POST", "/seed", { data: base });
     _cache = seedRes.data || base;
     _writeCache(_cache);
@@ -60,7 +88,7 @@ async function cloudInit(seedData) {
     return false;
   } catch (e) {
     console.warn('⚠️ Sin conexion al servidor, modo local:', e);
-    _cache = _readCache() || seedData || {};
+    _cache = _migrarDesdeViejo() || _readCache() || seedData || {};
     _ready = true;
     return false;
   }
@@ -89,11 +117,11 @@ async function _sync() {
 /* ---------- API publica (igual que siempre) ---------- */
 
 function getProductos() {
-  if (!_cache) _cache = _readCache() || {};
+  if (!_cache) _cache = _migrarDesdeViejo() || _readCache() || {};
   return (_cache.productos || []).slice();
 }
 function saveProductos(list) {
-  if (!_cache) _cache = _readCache() || {};
+  if (!_cache) _cache = _migrarDesdeViejo() || _readCache() || {};
   _cache.productos = list.slice();
   _sync();
 }
@@ -105,11 +133,11 @@ function updateProductos(mutatorFn) {
 }
 
 function getBanners() {
-  if (!_cache) _cache = _readCache() || {};
+  if (!_cache) _cache = _migrarDesdeViejo() || _readCache() || {};
   return (_cache.banners || []).slice();
 }
 function saveBanners(list) {
-  if (!_cache) _cache = _readCache() || {};
+  if (!_cache) _cache = _migrarDesdeViejo() || _readCache() || {};
   _cache.banners = list.slice();
   _sync();
 }
@@ -121,31 +149,31 @@ function updateBanners(mutatorFn) {
 }
 
 function getSettings() {
-  if (!_cache) _cache = _readCache() || {};
+  if (!_cache) _cache = _migrarDesdeViejo() || _readCache() || {};
   return { ...(_cache.settings || {}) };
 }
 function saveSettings(s) {
-  if (!_cache) _cache = _readCache() || {};
+  if (!_cache) _cache = _migrarDesdeViejo() || _readCache() || {};
   _cache.settings = { ...s };
   _sync();
 }
 
 function getPresupuestos() {
-  if (!_cache) _cache = _readCache() || {};
+  if (!_cache) _cache = _migrarDesdeViejo() || _readCache() || {};
   return (_cache.presupuestos || []).slice();
 }
 function savePresupuestos(list) {
-  if (!_cache) _cache = _readCache() || {};
+  if (!_cache) _cache = _migrarDesdeViejo() || _readCache() || {};
   _cache.presupuestos = list.slice();
   _sync();
 }
 
 function getSolicitudesMayoristas() {
-  if (!_cache) _cache = _readCache() || {};
+  if (!_cache) _cache = _migrarDesdeViejo() || _readCache() || {};
   return (_cache.solicitudesMayoristas || []).slice();
 }
 function saveSolicitudesMayoristas(list) {
-  if (!_cache) _cache = _readCache() || {};
+  if (!_cache) _cache = _migrarDesdeViejo() || _readCache() || {};
   _cache.solicitudesMayoristas = list.slice();
   _sync();
 }
@@ -164,11 +192,11 @@ function agregarSolicitudMayorista(datos) {
 }
 
 function getMayoristasAprobados() {
-  if (!_cache) _cache = _readCache() || {};
+  if (!_cache) _cache = _migrarDesdeViejo() || _readCache() || {};
   return (_cache.mayoristasAprobados || []).slice();
 }
 function saveMayoristasAprobados(list) {
-  if (!_cache) _cache = _readCache() || {};
+  if (!_cache) _cache = _migrarDesdeViejo() || _readCache() || {};
   _cache.mayoristasAprobados = list.slice();
   _sync();
 }
