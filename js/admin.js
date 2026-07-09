@@ -200,9 +200,9 @@ function abrirFormProducto(id){
           </div>
         </div>
         <div class="form-field">
-          <label>Imagenes del producto (2 a 3 recomendadas, se suben como base64)</label>
+          <label>Imagenes del producto (hasta 4, se suben como base64)</label>
           <div id="pf-imagenes-cont" class="img-upload-grid">
-            ${[0,1,2].map(i => `
+            ${[0,1,2,3].map(i => `
               <div class="img-upload-item">
                 ${p && p.imagenes && p.imagenes[i] ? `<img src="${p.imagenes[i]}" class="img-upload-preview" data-idx="${i}">` : `<div class="img-upload-placeholder" data-idx="${i}">Imagen ${i+1}</div>`}
                 <input type="file" accept="image/*" data-idx="${i}" class="img-upload-input">
@@ -292,7 +292,7 @@ function cerrarFormProducto(){
 }
 
 function guardarProducto(){
-  const imagenes = [_imgCache[0], _imgCache[1], _imgCache[2]].filter(Boolean);
+  const imagenes = [_imgCache[0], _imgCache[1], _imgCache[2], _imgCache[3]].filter(Boolean);
 
   const datos = {
     nombre: document.getElementById("pf-nombre").value.trim(),

@@ -192,16 +192,22 @@ function tarjetaProducto(p, esMayorista){
   const sinStock = p.sinStock;
   const precio = esMayorista ? p.precioMayorista : p.precioMinorista;
   const medida = p.unidad === "unidad" ? "1 unidad" : `${p.cantidad}${p.unidad === "kilogramos" ? "kg" : "g"}`;
-  const img1 = p.imagenes && p.imagenes[0] ? p.imagenes[0] : "";
-  const img2 = p.imagenes && p.imagenes[1] ? p.imagenes[1] : "";
-  const tieneMulti = img1 && img2;
+  const imagenes = (p.imagenes || []).filter(Boolean);
+  const multi = imagenes.length > 1;
   return `
     <article class="card-prod cat-${p.categoria}${sinStock ? " sin-stock" : ""}" data-id="${p.id}">
-      <div class="foto ${tieneMulti ? 'multi-img' : ''}" data-img1="${img1}" data-img2="${img2}">
+      <div class="foto slider">
         ${p.categoria === "caza" ? '<span class="badge-caza">Sabores de Caza</span>' : ""}
         ${sinStock ? '<span class="badge-sin-stock">Sin stock</span>' : ""}
-        ${img1 ? `<img src="${img1}" alt="${escapeHtml(p.nombre)}" class="img-principal" loading="lazy">` : `<span class="img-placeholder">${p.nombre.charAt(0)}</span>`}
-        ${img2 ? `<img src="${img2}" alt="${escapeHtml(p.nombre)}" class="img-secundaria" loading="lazy">` : ""}
+        <div class="foto-track">
+          ${imagenes.map((img, i) => `<img src="${img}" alt="${escapeHtml(p.nombre)}" class="foto-img" data-idx="${i}" loading="lazy">`).join("")}
+          ${imagenes.length === 0 ? `<span class="img-placeholder">${p.nombre.charAt(0)}</span>` : ""}
+        </div>
+        ${multi ? `
+          <div class="foto-dots">${imagenes.map((_, i) => `<span class="dot${i === 0 ? ' activo' : ''}" data-idx="${i}"></span>`).join("")}</div>
+          <button class="foto-arrow prev" data-dir="-1" aria-label="Anterior">&#8249;</button>
+          <button class="foto-arrow next" data-dir="1" aria-label="Siguiente">&#8250;</button>
+        ` : ""}
       </div>
       <div class="info">
         <h3>${escapeHtml(p.nombre)}</h3>
@@ -246,28 +252,62 @@ function bindTarjetas(){
       }, 1100);
     });
 
-    const foto = card.querySelector(".foto.multi-img");
-    if (foto) {
-      card.addEventListener("mouseenter", () => {
-        foto.querySelector(".img-principal")?.classList.add("oculto-img");
-        foto.querySelector(".img-secundaria")?.classList.add("visible-img");
-      });
-      card.addEventListener("mouseleave", () => {
-        foto.querySelector(".img-principal")?.classList.remove("oculto-img");
-        foto.querySelector(".img-secundaria")?.classList.remove("visible-img");
-      });
-      card.addEventListener("touchstart", function(e){
-        if (this._toggled) {
-          foto.querySelector(".img-principal")?.classList.remove("oculto-img");
-          foto.querySelector(".img-secundaria")?.classList.remove("visible-img");
-          this._toggled = false;
-        } else {
-          foto.querySelector(".img-principal")?.classList.add("oculto-img");
-          foto.querySelector(".img-secundaria")?.classList.add("visible-img");
-          this._toggled = true;
-        }
-      });
+    const slider = card.querySelector(".foto.slider");
+    if (!slider) return;
+    const track = slider.querySelector(".foto-track");
+    const imgs = track?.querySelectorAll(".foto-img");
+    const total = imgs?.length || 0;
+    if (total < 2) return;
+
+    let currentIdx = 0;
+    let startX = 0;
+    let isDragging = false;
+
+    function updateSlider(){
+      track.style.transform = `translateX(-${currentIdx * 100}%)`;
+      slider.querySelectorAll(".dot").forEach((d, i) => d.classList.toggle("activo", i === currentIdx));
     }
+
+    slider.querySelectorAll(".foto-arrow").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const dir = parseInt(btn.getAttribute("data-dir"));
+        currentIdx = (currentIdx + dir + total) % total;
+        updateSlider();
+      });
+    });
+
+    slider.querySelectorAll(".dot").forEach(dot => {
+      dot.addEventListener("click", (e) => {
+        e.stopPropagation();
+        currentIdx = parseInt(dot.getAttribute("data-idx"));
+        updateSlider();
+      });
+    });
+
+    slider.addEventListener("touchstart", (e) => {
+      startX = e.touches[0].clientX;
+      isDragging = true;
+      track.style.transition = "none";
+    }, { passive: true });
+
+    slider.addEventListener("touchmove", (e) => {
+      if (!isDragging) return;
+      const diff = e.touches[0].clientX - startX;
+      track.style.transform = `translateX(${-currentIdx * slider.offsetWidth + diff}px)`;
+    }, { passive: true });
+
+    slider.addEventListener("touchend", (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      track.style.transition = "transform 0.3s ease";
+      const diff = e.changedTouches[0].clientX - startX;
+      if (Math.abs(diff) > 50) {
+        if (diff < 0) currentIdx = Math.min(currentIdx + 1, total - 1);
+        else currentIdx = Math.max(currentIdx - 1, 0);
+      }
+      updateSlider();
+    }, { passive: true });
   });
 }
 
