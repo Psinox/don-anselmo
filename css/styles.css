@@ -391,20 +391,20 @@ h1,h2,h3,h4{ font-family: var(--f-display); margin: 0; }
   font-size: 0.75rem; color: var(--alerta); font-weight: 600;
   margin: 6px 0 0; text-align: center;
 }
-.card-prod .info{ padding: 12px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
-.card-prod h3{ font-size: 0.92rem; line-height: 1.25; color: var(--texto-oscuro); }
-.card-prod .desc-corta{ font-size: 0.74rem; color: #7a6a54; flex: 1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.card-prod .info{ padding: 14px 12px; display: flex; flex-direction: column; gap: 6px; flex: 1; text-align: center; align-items: center; }
+.card-prod h3{ font-size: 0.92rem; line-height: 1.25; color: var(--texto-oscuro); text-align: center; }
+.card-prod .desc-corta{ font-size: 0.74rem; color: #7a6a54; flex: 1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-align: center; }
 .card-prod .medida{
-  display: inline-block; align-self: flex-start;
+  display: inline-block;
   font-size: 0.66rem; color: var(--marron); background: rgba(107,68,35,0.08);
   padding: 2px 7px; border-radius: 3px; font-weight: 600;
 }
-.card-prod .precio-row{ display: flex; align-items: baseline; justify-content: space-between; margin-top: 4px; }
+.card-prod .precio-row{ display: flex; align-items: baseline; justify-content: center; gap: 8px; margin-top: 4px; }
 .card-prod .precio{ font-family: var(--f-display); font-weight: 700; font-size: 1.15rem; color: var(--marron); }
-.card-prod .precio .prev{ font-size: 0.68rem; color: #a89a86; text-decoration: line-through; font-family: var(--f-body); font-weight: 400; margin-right: 4px; }
+.card-prod .precio .prev{ font-size: 0.68rem; color: #a89a86; text-decoration: line-through; font-family: var(--f-body); font-weight: 400; }
 .card-prod .tag-mayorista{ font-size: 0.6rem; color: var(--exito); font-weight: 700; text-transform: uppercase; }
 
-.stepper{ display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.stepper{ display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; }
 .stepper button{
   width: 30px; height: 30px; border-radius: 50%;
   border: 1.5px solid var(--marron); background: #fff; color: var(--marron);
