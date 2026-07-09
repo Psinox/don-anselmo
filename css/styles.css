@@ -604,3 +604,52 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .my-msj{ margin-top: 10px; font-size: 0.85rem; text-align: center; }
 
 .oculto{ display: none !important; }
+
+/* ---------- Dark mode (publico) ---------- */
+body.dark-mode{
+  --negro: #100E0C;
+  --negro-2: #1A1613;
+  --verde-monte: #161B14;
+  --dorado: #C89B3C;
+  --dorado-claro: #E8C873;
+  --dorado-opaco: rgba(200,155,60,0.35);
+  --crema: #17130f;
+  --crema-2: #241d17;
+  --marron: #e3c583;
+  --marron-osc: #4A2E17;
+  --texto-claro: #ece3d3;
+  --texto-oscuro: #ece3d3;
+  --exito: #4E7A51;
+  --alerta: #B4432E;
+}
+body.dark-mode .card-prod{ background: #241d17; border-color: rgba(232,197,131,0.12); }
+body.dark-mode .card-prod .desc-corta{ color: #b3a488; }
+body.dark-mode .card-prod .medida{ background: rgba(232,197,131,0.1); }
+body.dark-mode .stepper button{ background: #2f261d; border-color: var(--marron); }
+body.dark-mode .stepper input{ background: transparent; color: var(--texto-oscuro); }
+body.dark-mode .btn-agregar{ background: var(--marron); color: #17130f; }
+body.dark-mode .drawer{ background: #17130f; }
+body.dark-mode .drawer-footer{ background: #241d17; border-color: rgba(232,197,131,0.12); }
+body.dark-mode .total-row .monto{ color: var(--marron); }
+body.dark-mode .modal-card{ background: #241d17; }
+body.dark-mode .modal-card h3{ color: var(--marron); }
+body.dark-mode .form-field input,
+body.dark-mode .form-field select,
+body.dark-mode .form-field textarea{ background: #2f261d; border-color: rgba(232,197,131,0.2); color: var(--texto-oscuro); }
+body.dark-mode .site-footer{ background: var(--negro); }
+body.dark-mode .seccion-mayorista{ background: var(--negro); }
+body.dark-mode .hero{ background: radial-gradient(circle at 50% -10%, #2a221a 0%, var(--negro) 60%); }
+
+/* Toggle dark mode en header publico */
+.btn-dark-toggle-public{
+  background: none; border: none; color: var(--crema);
+  width: 40px; height: 40px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s ease, transform 0.3s ease;
+}
+.btn-dark-toggle-public:hover{ background: rgba(232,200,115,0.12); transform: rotate(-12deg); }
+.btn-dark-toggle-public svg{ width: 20px; height: 20px; stroke: currentColor; }
+@media (max-width: 640px){
+  .btn-dark-toggle-public{ width: 36px; height: 36px; }
+  .btn-dark-toggle-public svg{ width: 18px; height: 18px; }
+}

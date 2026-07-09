@@ -30,6 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderCarrito();
   actualizarEstadoMayorista();
   bindUI();
+  initDarkMode();
 });
 
 function renderLogos(){
@@ -524,4 +525,27 @@ function escapeHtml(str){
   const div = document.createElement("div");
   div.textContent = str ?? "";
   return div.innerHTML;
+}
+
+/* ---------- Dark mode (publico) ---------- */
+const DARK_MODE_KEY_PUB = "donanselmo_dark";
+const ICONO_LUNA_PUB = '<svg id="icono-dark-public" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+const ICONO_SOL_PUB = '<svg id="icono-dark-public" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/></svg>';
+
+function aplicarDarkMode(activo){
+  document.body.classList.toggle("dark-mode", activo);
+  const icono = document.getElementById("icono-dark-public");
+  const btn = document.getElementById("btn-dark-toggle-public");
+  if (icono) icono.outerHTML = activo ? ICONO_SOL_PUB : ICONO_LUNA_PUB;
+  if (btn) btn.title = activo ? "Modo claro" : "Modo oscuro";
+}
+
+function initDarkMode(){
+  const activo = localStorage.getItem(DARK_MODE_KEY_PUB) === "1";
+  aplicarDarkMode(activo);
+  document.getElementById("btn-dark-toggle-public")?.addEventListener("click", () => {
+    const nuevo = !document.body.classList.contains("dark-mode");
+    localStorage.setItem(DARK_MODE_KEY_PUB, nuevo ? "1" : "0");
+    aplicarDarkMode(nuevo);
+  });
 }
