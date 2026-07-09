@@ -15,7 +15,30 @@ let tabActiva = "productos";
 let editandoProductoId = null;
 let editandoBannerId = null;
 
+const DARK_MODE_KEY = "donanselmo_admin_dark";
+const ICONO_LUNA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+const ICONO_SOL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/></svg>';
+
+function aplicarModoOscuro(activo){
+  document.body.classList.toggle("dark-mode", activo);
+  const icono = document.getElementById("icono-dark-toggle");
+  const btn = document.getElementById("btn-dark-toggle");
+  if (icono) icono.outerHTML = activo ? ICONO_SOL.replace("<svg ", '<svg id="icono-dark-toggle" ') : ICONO_LUNA.replace("<svg ", '<svg id="icono-dark-toggle" ');
+  if (btn) btn.title = activo ? "Modo claro" : "Modo oscuro";
+}
+
+function initModoOscuro(){
+  const activo = localStorage.getItem(DARK_MODE_KEY) === "1";
+  aplicarModoOscuro(activo);
+  document.getElementById("btn-dark-toggle")?.addEventListener("click", () => {
+    const nuevoEstado = !document.body.classList.contains("dark-mode");
+    localStorage.setItem(DARK_MODE_KEY, nuevoEstado ? "1" : "0");
+    aplicarModoOscuro(nuevoEstado);
+  });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
+  initModoOscuro();
   initStoreIfEmpty();
 
   if (typeof cloudInit === "function") {
@@ -104,7 +127,7 @@ function escapeHtml(str){
   return div.innerHTML;
 }
 
-const CLOUD_NAME = "dmdpzjwom";
+const CLOUD_NAME = "dmdpjzwom";
 const UPLOAD_PRESET = "don-anselmo";
 
 function subirImgCloudinary(file, cb){
@@ -233,6 +256,7 @@ function abrirFormProducto(id){
         </div>
         <div class="form-field">
           <label>Imagenes del producto (hasta 4, se suben a Cloudinary)</label>
+          <small class="img-hint">Formato cuadrado (1:1). Recomendado: 800x800px o más, JPG o PNG, menos de 2MB.</small>
           <div id="pf-imagenes-cont" class="img-upload-grid">
             ${[0,1,2,3].map(i => `
               <div class="img-upload-item">
@@ -461,6 +485,7 @@ function abrirFormBanner(id){
         </div>
         <div class="form-field" id="bf-imagen-field">
           <label>Imagen del banner</label>
+          <small class="img-hint">Formato horizontal (aprox. 16:9). Recomendado: 1200x500px o más.</small>
           ${b && b.imagen ? `<div class="img-upload-item"><img src="${b.imagen}" class="img-upload-preview"><button type="button" class="btn-img-remove" id="btn-remove-banner-img">Quitar imagen</button></div>` : ""}
           <input type="file" accept="image/*" id="bf-imagen-input">
         </div>
@@ -626,6 +651,7 @@ function renderAjustesForm(){
         </div>
         <div class="form-field" id="aj-hero-imagen-field" style="display:${s.heroTipo === "imagen" ? "block" : "none"};">
           <label>Imagen de fondo del hero</label>
+          <small class="img-hint">Imagen horizontal de fondo. Recomendado: 1920x1080px o más, JPG.</small>
           ${s.heroImagen ? `<div class="img-upload-item"><img src="${s.heroImagen}" class="img-upload-preview" style="max-height:150px;"><button type="button" class="btn-img-remove" id="btn-remove-hero-img">Quitar</button></div>` : ""}
           <input type="file" accept="image/*" id="aj-hero-imagen-input">
         </div>
@@ -1138,8 +1164,8 @@ function renderMayoristasAdmin(){
             <span>${escapeHtml(s.negocio) || "-"} · ${escapeHtml(s.whatsapp)} · ${new Date(s.fecha).toLocaleDateString("es-AR")}</span>
           </div>
           <div class="acciones" style="gap:4px;">
-            <button type="button" class="btn-icono" style="background:rgba(78,122,81,0.12);color:var(--exito);font-size:1rem;" data-aprobar-m="${s.id}" aria-label="Aprobar">&#10003;</button>
-            <button type="button" class="btn-icono" style="background:rgba(180,67,46,0.12);color:var(--alerta);font-size:1rem;" data-rechazar-m="${s.id}" aria-label="Rechazar">&#10005;</button>
+            <button type="button" class="btn btn-dorado" style="font-size:0.75rem;padding:4px 12px;" data-aprobar-m="${s.id}">Aprobar</button>
+            <button type="button" class="btn btn-outline" style="font-size:0.75rem;padding:4px 12px;color:var(--alerta);border-color:var(--alerta);" data-rechazar-m="${s.id}">Rechazar</button>
           </div>
         </div>`;
     });
@@ -1163,8 +1189,7 @@ function renderMayoristasAdmin(){
             <span style="display:block;font-size:0.8rem;color:var(--marron);">${compras.length} compra(s) · Total: ${formatearMoneda(totalGastado)}</span>
           </div>
           <div class="acciones" style="gap:4px;">
-            <button type="button" class="btn-icono" style="background:rgba(107,68,35,0.1);" data-ver-compras="${i}" aria-label="Compras">&#128722;</button>
-            <button type="button" class="btn-icono" style="background:rgba(180,67,46,0.12);color:var(--alerta);" data-eliminar-m="${m.id}" aria-label="Eliminar mayorista">&#128465;</button>
+            <button type="button" class="btn btn-outline" style="font-size:0.75rem;padding:4px 10px;" data-ver-compras="${i}">Compras</button>
           </div>
         </div>`;
     });
@@ -1193,16 +1218,6 @@ function renderMayoristasAdmin(){
     btn.addEventListener("click", () => {
       const idx = parseInt(btn.getAttribute("data-ver-compras"));
       mostrarComprasMayorista(idx);
-    });
-  });
-  cont.querySelectorAll("[data-eliminar-m]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const id = btn.getAttribute("data-eliminar-m");
-      if (confirm("Eliminar este mayorista? Ya no podra acceder como mayorista.")){
-        eliminarMayorista(id);
-        renderMayoristasAdmin();
-        mostrarToast("Mayorista eliminado");
-      }
     });
   });
 }
