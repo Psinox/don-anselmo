@@ -351,6 +351,7 @@ function bindUI(){
   });
 
   document.getElementById("btn-carrito")?.addEventListener("click", () => toggleDrawer(true));
+  document.getElementById("carrito-flotante")?.addEventListener("click", () => toggleDrawer(true));
   document.getElementById("btn-cerrar-carrito")?.addEventListener("click", () => toggleDrawer(false));
   document.getElementById("overlay")?.addEventListener("click", () => {
     toggleDrawer(false);

@@ -72,11 +72,13 @@ const Carrito = {
   },
 
   renderBadge(){
-    const el = document.getElementById("cart-badge");
-    if (!el) return;
     const total = this.cantidadTotal();
-    el.textContent = total;
-    el.classList.toggle("oculto", total === 0);
+    const badge = document.getElementById("cart-badge");
+    if (badge) { badge.textContent = total; badge.classList.toggle("oculto", total === 0); }
+    const flotante = document.getElementById("carrito-flotante");
+    const fbadge = document.getElementById("flotante-badge");
+    if (flotante) flotante.classList.toggle("oculto", total === 0);
+    if (fbadge) { fbadge.textContent = total; fbadge.classList.toggle("oculto", total === 0); }
   },
 };
 
