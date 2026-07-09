@@ -12,23 +12,23 @@
 
 <!-- ================= HEADER ================= -->
 <header class="site-header">
-  <div class="container">
-    <a href="#" class="brand">
-      <img src="assets/isotipo.svg" alt="Isotipo Don Anselmo" class="isotipo">
-      <img src="assets/logotipo.svg" alt="Don Anselmo" class="logotipo">
-    </a>
+  <div class="container header-flex">
+    <div class="header-left">
+      <button class="icon-btn hamburger" id="btn-hamburger" aria-label="Abrir menú">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+      <nav class="nav-desktop">
+        <ul>
+          <li><a href="#cat-charcuteria" onclick="irACategoria('charcuteria')">Charcutería</a></li>
+          <li><a href="#cat-caza" onclick="irACategoria('caza')">Sabores de Caza</a></li>
+          <li><a href="#cat-recuerdos" onclick="irACategoria('recuerdos')">Recuerdos del Iberá</a></li>
+          <li><a href="#cat-grabados" onclick="irACategoria('grabados')">Grabados</a></li>
+          <li><a href="#" data-abrir-mayorista>Mayoristas</a></li>
+        </ul>
+      </nav>
+    </div>
 
-    <nav class="nav-desktop">
-      <ul>
-        <li><a href="#cat-charcuteria" onclick="irACategoria('charcuteria')">Charcutería</a></li>
-        <li><a href="#cat-caza" onclick="irACategoria('caza')">Sabores de Caza</a></li>
-        <li><a href="#cat-recuerdos" onclick="irACategoria('recuerdos')">Recuerdos del Iberá</a></li>
-        <li><a href="#cat-grabados" onclick="irACategoria('grabados')">Grabados</a></li>
-        <li><a href="#" data-abrir-mayorista>Mayoristas</a></li>
-      </ul>
-    </nav>
-
-    <div class="header-actions">
+    <div class="header-right">
       <a href="#" data-abrir-mayorista class="icon-btn" title="Soy mayorista" aria-label="Soy mayorista">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M3 7l1.5 12h15L21 7M3 7h18M3 7l1-3h16l1 3M9 11v3M15 11v3"/></svg>
       </a>
@@ -36,9 +36,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2.5 3h2l2.6 12.6a2 2 0 0 0 2 1.6h8.4a2 2 0 0 0 2-1.6L21 7H6"/></svg>
         <span class="badge-count oculto" id="cart-badge">0</span>
       </button>
-      <button class="icon-btn hamburger" id="btn-hamburger" aria-label="Abrir menú">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
-      </button>
+      <a href="#" class="brand">
+        <img src="assets/isotipo.svg" alt="Isotipo Don Anselmo" class="isotipo">
+        <img src="assets/logotipo.svg" alt="Don Anselmo" class="logotipo">
+      </a>
     </div>
   </div>
   <nav class="nav-mobile" id="nav-mobile">

@@ -155,7 +155,7 @@ function renderProductosAdmin(){
             </span>
           </div>
           <div class="acciones">
-            <button type="button" data-editar-prod="${p.id}" aria-label="Editar" class="btn-icono">✏️</button>
+            <button type="button" data-editar-prod="${p.id}" aria-label="Editar" class="btn-icono"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19.5 8.5a2.1 2.1 0 0 0-3-3L5.5 16.5 4 20Z"/><path d="M13.5 6.5l4 4"/></svg></button>
             <button type="button" class="eliminar" data-eliminar-prod="${p.id}" aria-label="Eliminar" class="btn-icono">X</button>
           </div>
         </div>`;
@@ -315,11 +315,11 @@ const _imgCache = {};
 let _uploadingCount = 0;
 
 function guardarImagenProducto(idx, b64){
-  _imgCache[idx] = b64;
+  _imgCache[idx] = b64; // string = nueva imagen para ese indice (o URL temporal mientras sube)
 }
 
 function quitarImgPreview(idx){
-  delete _imgCache[idx];
+  _imgCache[idx] = null; // null explicito = "se saco esta imagen", no confundir con "no se toco"
   const item = document.querySelector(`.img-upload-item [data-idx="${idx}"]`)?.closest(".img-upload-item");
   if (item) {
     item.querySelector(".img-upload-preview")?.remove();
@@ -340,7 +340,14 @@ function cerrarFormProducto(){
 }
 
 function guardarProducto(){
-  const imagenes = [_imgCache[0], _imgCache[1], _imgCache[2], _imgCache[3]].filter(Boolean);
+  // Para cada uno de los 4 casilleros: si se subio una imagen nueva, usarla;
+  // si se saco explicitamente (quitar), no incluirla; si no se toco, mantener la que ya tenia el producto.
+  const existente = editandoProductoId ? getProductos().find(p => p.id === editandoProductoId) : null;
+  const imagenesPrevias = (existente && existente.imagenes) || [];
+  const imagenes = [0, 1, 2, 3].map(i => {
+    if (Object.prototype.hasOwnProperty.call(_imgCache, i)) return _imgCache[i]; // string nueva, o null si se saco
+    return imagenesPrevias[i] || null; // no se toco: conservar la que ya estaba
+  }).filter(Boolean);
 
   const datos = {
     nombre: document.getElementById("pf-nombre").value.trim(),
@@ -357,11 +364,7 @@ function guardarProducto(){
 
   updateProductos(list => {
     if (editandoProductoId){
-      const existing = list.find(p => p.id === editandoProductoId);
-      if (existing) {
-        const imgs = imagenes.length > 0 ? imagenes : existing.imagenes || [];
-        return list.map(p => p.id === editandoProductoId ? { ...p, ...datos, imagenes: imgs } : p);
-      }
+      return list.map(p => p.id === editandoProductoId ? { ...p, ...datos } : p);
     }
     const nuevoId = "p" + Date.now().toString().slice(-8);
     return [...list, { id: nuevoId, ...datos }];
@@ -398,7 +401,7 @@ function renderBannersAdmin(){
           </span>
         </div>
         <div class="acciones">
-          <button type="button" data-editar-banner="${b.id}" aria-label="Editar" class="btn-icono">✏️</button>
+          <button type="button" data-editar-banner="${b.id}" aria-label="Editar" class="btn-icono"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19.5 8.5a2.1 2.1 0 0 0-3-3L5.5 16.5 4 20Z"/><path d="M13.5 6.5l4 4"/></svg></button>
           <button type="button" class="eliminar" data-eliminar-banner="${b.id}" aria-label="Eliminar" class="btn-icono">X</button>
         </div>
       </div>`;
@@ -850,7 +853,7 @@ function renderAjustesForm(){
       return;
     }
     setAdminPassword(nueva);
-    msj.innerHTML = '<span style="color:var(--verde);">Contrasena cambiada correctamente.</span>';
+    msj.innerHTML = '<span style="color:var(--exito);">Contrasena cambiada correctamente.</span>';
     document.getElementById("aj-pass-actual").value = "";
     document.getElementById("aj-pass-nueva").value = "";
     document.getElementById("aj-pass-confirmar").value = "";
@@ -859,20 +862,11 @@ function renderAjustesForm(){
 
 /* =========================================================================
    PRESUPUESTOS / PDF
+   -------------------------------------------------------------------------
+   getPresupuestos()/savePresupuestos() vienen de cloud-db.js (o de store.js
+   como fallback si el Worker no esta disponible) — no se redefinen aca para
+   que los presupuestos tambien viajen al KV igual que productos/settings.
    ========================================================================= */
-
-const PRESUP_KEY = "donanselmo_presupuestos";
-
-function getPresupuestos(){
-  try {
-    const raw = localStorage.getItem(PRESUP_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch(e){ return []; }
-}
-
-function savePresupuestos(list){
-  localStorage.setItem(PRESUP_KEY, JSON.stringify(list));
-}
 
 function renderPresupuestosAdmin(){
   const cont = document.getElementById("lista-presupuestos");

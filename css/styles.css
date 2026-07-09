@@ -72,14 +72,20 @@ h1,h2,h3,h4{ font-family: var(--f-display); margin: 0; }
   background: var(--negro);
   border-bottom: 1px solid rgba(200,155,60,0.25);
 }
-.site-header .container{
+.site-header .container.header-flex{
   display: flex; align-items: center; justify-content: space-between;
   height: var(--header-h);
   gap: 10px;
 }
-.brand{ display: flex; align-items: center; gap: 8px; color: var(--crema); min-width: 0; text-decoration: none; }
-.brand .isotipo{ height: 40px; width: 40px; flex-shrink: 0; }
-.brand .logotipo{ height: 32px; flex-shrink: 0; }
+.header-left{ display: flex; align-items: center; gap: 20px; min-width: 0; }
+.header-right{ display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.brand{ display: flex; align-items: center; gap: 8px; color: var(--crema); min-width: 0; text-decoration: none; margin-left: 8px; }
+.brand .isotipo{ height: 34px; width: 34px; flex-shrink: 0; }
+.brand .logotipo{ height: 22px; flex-shrink: 0; }
+@media (min-width: 640px){
+  .brand .isotipo{ height: 40px; width: 40px; }
+  .brand .logotipo{ height: 28px; }
+}
 
 .nav-desktop{ display: none; }
 .nav-desktop ul{ display: flex; gap: 22px; }

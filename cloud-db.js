@@ -17,7 +17,7 @@
       (Settings > Variables and Secrets). Si no coinciden letra por letra, el Worker
       va a responder 401 Unauthorized y el sitio va a funcionar solo con localStorage local. */
 const CLOUD_URL = "https://don-anselmo-api.kivaro-dev.workers.dev";
-const CLOUD_API_KEY = "dona2026"; // TODO: reemplazar por la clave real que configuraste en el Worker
+const CLOUD_API_KEY = "c57403ecf9266b670f105d68a70fcdca"; // TODO: reemplazar por la clave real que configuraste en el Worker
 
 const CACHE_KEY = "donanselmo_cloud_cache";
 const VERSION_KEY = "donanselmo_cloud_v";

@@ -53,6 +53,10 @@ if (typeof getSettings === "undefined") {
 
 if (typeof initStoreIfEmpty === "undefined") {
   function initStoreIfEmpty() {
+    // Si cloud-db.js esta activo, el se encarga de sembrar datos (POST /seed)
+    // la primera vez. Hacer esto tambien aca pisaria el cache con SEED_* en
+    // cada carga de pagina, antes de que llegue la respuesta real del Worker.
+    if (typeof cloudInit === "function") return;
     if (localStorage.getItem(DB_KEYS.productos) === null) saveProductos(SEED_PRODUCTS);
     if (localStorage.getItem(DB_KEYS.banners) === null) saveBanners(SEED_BANNERS);
     if (localStorage.getItem(DB_KEYS.settings) === null) saveSettings(SEED_SETTINGS);
@@ -102,6 +106,14 @@ if (typeof agregarSolicitudMayorista === "undefined") {
     m.compras = m.compras || []; m.compras.push({ fecha: new Date().toLocaleDateString("es-AR"), total: compra.total, items: compra.items });
     saveMayoristasAprobados(list); return true;
   }
+}
+
+/* ---------- Presupuestos ---------- */
+
+if (typeof getPresupuestos === "undefined") {
+  const _PRESUP_KEY = "donanselmo_presupuestos";
+  function getPresupuestos() { return _read(_PRESUP_KEY, []); }
+  function savePresupuestos(list) { return _write(_PRESUP_KEY, list); }
 }
 
 /* ---------- Carrito (siempre localStorage) ---------- */

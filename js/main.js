@@ -462,7 +462,7 @@ function bindUI(){
       if (!datos.nombre || !datos.whatsapp) return;
       const ok = agregarSolicitudMayorista(datos);
       if (ok){
-        msjReg.innerHTML = '<span style="color:var(--verde);">Solicitud enviada. Te avisaremos cuando sea aprobada.</span>';
+        msjReg.innerHTML = '<span style="color:var(--exito);">Solicitud enviada. Te avisaremos cuando sea aprobada.</span>';
         formMayorista.reset();
       } else {
         msjReg.innerHTML = '<span style="color:var(--alerta);">Ya hay una solicitud pendiente con ese WhatsApp.</span>';
