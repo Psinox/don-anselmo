@@ -12,6 +12,7 @@ const CACHE_KEY = "donanselmo_cloud_cache";
 
 let _cache = null;
 let _ready = false;
+let _pendingSync = null;
 
 /* ---------- interno ---------- */
 
@@ -77,6 +78,7 @@ async function cloudInit(seedData) {
       _cache = json.data;
       _writeCache(_cache);
       _ready = true;
+      _flushPendingSync();
       return true;
     }
     const migrado = _migrarDesdeViejo();
@@ -85,11 +87,13 @@ async function cloudInit(seedData) {
     _cache = seedRes.data || base;
     _writeCache(_cache);
     _ready = true;
+    _flushPendingSync();
     return false;
   } catch (e) {
     console.warn('⚠️ Sin conexion al servidor, modo local:', e);
     _cache = _migrarDesdeViejo() || _readCache() || seedData || {};
     _ready = true;
+    _flushPendingSync();
     return false;
   }
 }
@@ -99,7 +103,10 @@ function isCloudReady() { return _ready; }
 /* ---------- sync: empuja el cache completo al Worker ---------- */
 
 async function _sync() {
-  if (!_ready) return;
+  if (!_ready) {
+    _pendingSync = _cache ? JSON.parse(JSON.stringify(_cache)) : null;
+    return;
+  }
   try {
     const json = await _fetch("POST", "/data", { data: _cache, expectedVersion: _cache._v || 0 });
     if (json.ok) {
@@ -111,6 +118,16 @@ async function _sync() {
     }
   } catch {
     _writeCache(_cache);
+  }
+}
+
+function _flushPendingSync() {
+  const data = _pendingSync;
+  _pendingSync = null;
+  if (data && _cache) {
+    Object.keys(data).forEach(k => { if (k !== '_v') _cache[k] = data[k]; });
+    _writeCache(_cache);
+    _sync();
   }
 }
 
