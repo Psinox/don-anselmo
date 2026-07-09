@@ -1176,8 +1176,8 @@ function renderMayoristasAdmin(){
             <span>${escapeHtml(s.negocio) || "-"} · ${escapeHtml(s.whatsapp)} · ${new Date(s.fecha).toLocaleDateString("es-AR")}</span>
           </div>
           <div class="acciones" style="gap:4px;">
-            <button type="button" class="btn btn-dorado" style="font-size:0.75rem;padding:4px 12px;" data-aprobar-m="${s.id}">Aprobar</button>
-            <button type="button" class="btn btn-outline" style="font-size:0.75rem;padding:4px 12px;color:var(--alerta);border-color:var(--alerta);" data-rechazar-m="${s.id}">Rechazar</button>
+            <button type="button" class="btn-icono" style="background:rgba(78,122,81,0.12);color:var(--exito);font-size:1rem;" data-aprobar-m="${s.id}" aria-label="Aprobar">&#10003;</button>
+            <button type="button" class="btn-icono" style="background:rgba(180,67,46,0.12);color:var(--alerta);font-size:1rem;" data-rechazar-m="${s.id}" aria-label="Rechazar">&#10005;</button>
           </div>
         </div>`;
     });
@@ -1201,7 +1201,8 @@ function renderMayoristasAdmin(){
             <span style="display:block;font-size:0.8rem;color:var(--marron);">${compras.length} compra(s) · Total: ${formatearMoneda(totalGastado)}</span>
           </div>
           <div class="acciones" style="gap:4px;">
-            <button type="button" class="btn btn-outline" style="font-size:0.75rem;padding:4px 10px;" data-ver-compras="${i}">Compras</button>
+            <button type="button" class="btn-icono" style="background:rgba(107,68,35,0.1);" data-ver-compras="${i}" aria-label="Compras">&#128722;</button>
+            <button type="button" class="btn-icono" style="background:rgba(180,67,46,0.12);color:var(--alerta);" data-eliminar-m="${m.id}" aria-label="Eliminar mayorista">&#128465;</button>
           </div>
         </div>`;
     });
@@ -1230,6 +1231,16 @@ function renderMayoristasAdmin(){
     btn.addEventListener("click", () => {
       const idx = parseInt(btn.getAttribute("data-ver-compras"));
       mostrarComprasMayorista(idx);
+    });
+  });
+  cont.querySelectorAll("[data-eliminar-m]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-eliminar-m");
+      if (confirm("Eliminar este mayorista? Ya no podra acceder como mayorista.")){
+        eliminarMayorista(id);
+        renderMayoristasAdmin();
+        mostrarToast("Mayorista eliminado");
+      }
     });
   });
 }
