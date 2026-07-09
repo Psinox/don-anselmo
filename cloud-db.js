@@ -1,29 +1,16 @@
 /* =========================================================================
    Don Anselmo — cloud-db.js
-   -------------------------------------------------------------------------
-   Capa de datos que habla con el Worker de Cloudflare.
-   Tiene la MISMA API que store.js (getProductos, updateProductos, etc.)
-   para que el resto del codigo no cambie.
-   -------------------------------------------------------------------------
-   Si no hay conexion con el Worker, usa localStorage como cache local.
-   Si hay conflicto de version, relee y reintenta automaticamente.
-   Timeout de 5s para no dejar la pantalla colgada.
+   Basado en el modelo simple que funciona en Dubenji.
+   Misma API publica de siempre (getProductos, updateProductos, etc.)
+   para que el resto del sitio no necesite cambios.
    ========================================================================= */
 
-/* ⚠️ IMPORTANTE — completar antes de subir a GitHub Pages:
-   1. CLOUD_URL: la URL real de tu Worker (Cloudflare > Workers & Pages > tu worker > Overview,
-      es el link "Visit" o el que aparece arriba, tipo https://NOMBRE.SUBDOMINIO.workers.dev)
-   2. CLOUD_API_KEY: el MISMO valor exacto que pusiste como Secret "API_KEY" en el Worker
-      (Settings > Variables and Secrets). Si no coinciden letra por letra, el Worker
-      va a responder 401 Unauthorized y el sitio va a funcionar solo con localStorage local. */
 const CLOUD_URL = "https://don-anselmo-api.kivaro-dev.workers.dev";
-const CLOUD_API_KEY = "dna-7f3a9c2e-Xk92-mQ2v";
+const CLOUD_API_KEY = "dna-2026-K7xP9mQ2vL45zRw8-anselmo"; // debe ser IGUAL en worker.js
 
 const CACHE_KEY = "donanselmo_cloud_cache";
-const VERSION_KEY = "donanselmo_cloud_v";
 
 let _cache = null;
-let _version = 0;
 let _ready = false;
 
 /* ---------- interno ---------- */
@@ -39,14 +26,6 @@ function _writeCache(data) {
   try { localStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch {}
 }
 
-function _readVersion() {
-  return parseInt(localStorage.getItem(VERSION_KEY) || "0", 10);
-}
-
-function _writeVersion(v) {
-  try { localStorage.setItem(VERSION_KEY, String(v)); } catch {}
-}
-
 async function _fetch(method, path, body) {
   const opts = {
     method,
@@ -58,37 +37,33 @@ async function _fetch(method, path, body) {
     opts.body = JSON.stringify(body);
   }
   const res = await fetch(CLOUD_URL + path, opts);
-  if (!res.ok) throw new Error("HTTP " + res.status);
+  if (!res.ok && res.status !== 409) throw new Error("HTTP " + res.status);
   return res.json();
 }
 
 /* ---------- inicializacion ---------- */
 
 async function cloudInit(seedData) {
-  /* 1. intentar traer datos del Worker */
   try {
     const json = await _fetch("GET", "/data");
-    if (json.ok && json.data) {
+    if (json.exists && json.data) {
       _cache = json.data;
-      _version = json.version;
       _writeCache(_cache);
-      _writeVersion(_version);
       _ready = true;
-      return true; /* datos nuevos del servidor */
+      return true;
     }
-  } catch {}
-
-  /* 2. si no hay datos en el cloud, seed */
-  if (!_cache) _cache = _readCache() || seedData || {};
-  if (!_cache.productos) _cache = seedData || _cache;
-  try {
-    const json = await _fetch("POST", "/seed", { data: _cache });
-    if (json.ok) _version = json.version;
-  } catch {}
-  _writeCache(_cache);
-  _writeVersion(_version);
-  _ready = true;
-  return false; /* datos locales */
+    const base = seedData || _readCache() || {};
+    const seedRes = await _fetch("POST", "/seed", { data: base });
+    _cache = seedRes.data || base;
+    _writeCache(_cache);
+    _ready = true;
+    return false;
+  } catch (e) {
+    console.warn('⚠️ Sin conexion al servidor, modo local:', e);
+    _cache = _readCache() || seedData || {};
+    _ready = true;
+    return false;
+  }
 }
 
 function isCloudReady() { return _ready; }
@@ -98,40 +73,30 @@ function isCloudReady() { return _ready; }
 async function _sync() {
   if (!_ready) return;
   try {
-    const json = await _fetch("POST", "/data", { data: _cache, version: _version });
+    const json = await _fetch("POST", "/data", { data: _cache, expectedVersion: _cache._v || 0 });
     if (json.ok) {
-      _version = json.version;
+      _cache._v = json.version;
       _writeCache(_cache);
-      _writeVersion(_version);
-    } else if (json.error === "conflict") {
-      /* conflicto: releer del servidor y reintentar */
-      const fresh = await _fetch("GET", "/data");
-      if (fresh.ok && fresh.data) {
-        _cache = fresh.data;
-        _version = fresh.version;
-        _writeCache(_cache);
-        _writeVersion(_version);
-      }
+    } else if (json.reason === "conflicto") {
+      _cache = json.data;
+      _writeCache(_cache);
     }
   } catch {
-    /* sin conexion: queda en cache local */
     _writeCache(_cache);
   }
 }
 
-/* ---------- API publica (igual que store.js) ---------- */
+/* ---------- API publica (igual que siempre) ---------- */
 
 function getProductos() {
   if (!_cache) _cache = _readCache() || {};
   return (_cache.productos || []).slice();
 }
-
 function saveProductos(list) {
   if (!_cache) _cache = _readCache() || {};
   _cache.productos = list.slice();
   _sync();
 }
-
 function updateProductos(mutatorFn) {
   const actuales = getProductos();
   const nuevos = mutatorFn(actuales.slice());
@@ -143,13 +108,11 @@ function getBanners() {
   if (!_cache) _cache = _readCache() || {};
   return (_cache.banners || []).slice();
 }
-
 function saveBanners(list) {
   if (!_cache) _cache = _readCache() || {};
   _cache.banners = list.slice();
   _sync();
 }
-
 function updateBanners(mutatorFn) {
   const actuales = getBanners();
   const nuevos = mutatorFn(actuales.slice());
@@ -161,7 +124,6 @@ function getSettings() {
   if (!_cache) _cache = _readCache() || {};
   return { ...(_cache.settings || {}) };
 }
-
 function saveSettings(s) {
   if (!_cache) _cache = _readCache() || {};
   _cache.settings = { ...s };
@@ -172,7 +134,6 @@ function getPresupuestos() {
   if (!_cache) _cache = _readCache() || {};
   return (_cache.presupuestos || []).slice();
 }
-
 function savePresupuestos(list) {
   if (!_cache) _cache = _readCache() || {};
   _cache.presupuestos = list.slice();
@@ -183,13 +144,11 @@ function getSolicitudesMayoristas() {
   if (!_cache) _cache = _readCache() || {};
   return (_cache.solicitudesMayoristas || []).slice();
 }
-
 function saveSolicitudesMayoristas(list) {
   if (!_cache) _cache = _readCache() || {};
   _cache.solicitudesMayoristas = list.slice();
   _sync();
 }
-
 function agregarSolicitudMayorista(datos) {
   const list = getSolicitudesMayoristas();
   if (list.find(s => s.whatsapp === datos.whatsapp)) return false;
@@ -208,13 +167,11 @@ function getMayoristasAprobados() {
   if (!_cache) _cache = _readCache() || {};
   return (_cache.mayoristasAprobados || []).slice();
 }
-
 function saveMayoristasAprobados(list) {
   if (!_cache) _cache = _readCache() || {};
   _cache.mayoristasAprobados = list.slice();
   _sync();
 }
-
 function aprobarMayorista(id) {
   const pendientes = getSolicitudesMayoristas();
   const idx = pendientes.findIndex(s => s.id === id);
@@ -226,12 +183,10 @@ function aprobarMayorista(id) {
   saveMayoristasAprobados(aprobados);
   return true;
 }
-
 function rechazarMayorista(id) {
   const list = getSolicitudesMayoristas().filter(s => s.id !== id);
   saveSolicitudesMayoristas(list);
 }
-
 function agregarCompraMayorista(mayoristaId, compra) {
   const list = getMayoristasAprobados();
   const m = list.find(x => x.id === mayoristaId);
@@ -246,8 +201,7 @@ function agregarCompraMayorista(mayoristaId, compra) {
   return true;
 }
 
-/* ---------- Sesion mayorista (solo localStorage, no va al cloud) ---------- */
-
+/* ---------- Sesion mayorista (solo localStorage) ---------- */
 function getMayorista() {
   try { const r = localStorage.getItem("donanselmo_mayorista_sesion"); return r ? JSON.parse(r) : null; } catch { return null; }
 }
@@ -255,7 +209,6 @@ function setMayorista(d) { try { localStorage.setItem("donanselmo_mayorista_sesi
 function clearMayorista() { try { localStorage.removeItem("donanselmo_mayorista_sesion"); } catch {} }
 
 /* ---------- Carrito (solo localStorage) ---------- */
-
 function getCarrito() {
   try { const r = localStorage.getItem("donanselmo_carrito"); return r ? JSON.parse(r) : []; } catch { return []; }
 }
