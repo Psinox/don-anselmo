@@ -537,4 +537,16 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   outline: 2px solid var(--dorado); outline-offset: 2px;
 }
 
+/* Mayorista tabs (modal) */
+.mayorista-tabs{ display: flex; gap: 0; margin-bottom: 16px; border-bottom: 2px solid var(--crema-2); }
+.mayorista-tab{
+  flex: 1; padding: 8px; font-size: 0.82rem; font-weight: 600;
+  background: none; border: none; border-bottom: 2px solid transparent;
+  margin-bottom: -2px; cursor: pointer; color: #8a7a63; transition: all 0.15s;
+}
+.mayorista-tab.activo{ color: var(--marron); border-bottom-color: var(--marron); }
+.mayorista-panel{ display: none; }
+.mayorista-panel.activo{ display: block; }
+.my-msj{ margin-top: 10px; font-size: 0.85rem; text-align: center; }
+
 .oculto{ display: none !important; }

@@ -169,23 +169,46 @@
 <div class="modal" id="modal-mayorista">
   <div class="modal-card">
     <button class="modal-cerrar" id="btn-cerrar-mayorista" aria-label="Cerrar">×</button>
-    <h3>Soy mayorista</h3>
-    <p class="sub">Registrate y accedé al instante a los precios especiales para reventa.</p>
-    <form id="form-mayorista">
-      <div class="form-field">
-        <label for="my-nombre">Nombre y apellido</label>
-        <input type="text" id="my-nombre" required>
-      </div>
-      <div class="form-field">
-        <label for="my-negocio">Nombre de tu negocio (opcional)</label>
-        <input type="text" id="my-negocio">
-      </div>
-      <div class="form-field">
-        <label for="my-whatsapp">WhatsApp</label>
-        <input type="tel" id="my-whatsapp" placeholder="Ej: 3794123456" required>
-      </div>
-      <button type="submit" class="btn btn-dorado btn-block">Activar precios mayoristas</button>
-    </form>
+    <div class="mayorista-tabs">
+      <button class="mayorista-tab activo" data-mtab="registro">Registrarme</button>
+      <button class="mayorista-tab" data-mtab="login">Ya estoy registrado</button>
+    </div>
+
+    <!-- Registro -->
+    <div class="mayorista-panel activo" id="mpanel-registro">
+      <h3>Soy mayorista</h3>
+      <p class="sub">Completá tus datos y envianos tu solicitud. Te responderemos a la brevedad.</p>
+      <form id="form-mayorista">
+        <div class="form-field">
+          <label for="my-nombre">Nombre y apellido</label>
+          <input type="text" id="my-nombre" required>
+        </div>
+        <div class="form-field">
+          <label for="my-negocio">Nombre de tu negocio (opcional)</label>
+          <input type="text" id="my-negocio">
+        </div>
+        <div class="form-field">
+          <label for="my-whatsapp">WhatsApp</label>
+          <input type="tel" id="my-whatsapp" placeholder="Ej: 3794123456" required>
+        </div>
+        <button type="submit" class="btn btn-dorado btn-block">Enviar solicitud</button>
+        <div id="my-msj-registro" class="my-msj"></div>
+      </form>
+    </div>
+
+    <!-- Login -->
+    <div class="mayorista-panel" id="mpanel-login">
+      <h3>Ingresar como mayorista</h3>
+      <p class="sub">Ingresá tu WhatsApp para acceder a los precios mayoristas.</p>
+      <form id="form-mayorista-login">
+        <div class="form-field">
+          <label for="my-login-whatsapp">WhatsApp</label>
+          <input type="tel" id="my-login-whatsapp" placeholder="Ej: 3794123456" required>
+        </div>
+        <button type="submit" class="btn btn-dorado btn-block">Ingresar</button>
+        <div id="my-msj-login" class="my-msj"></div>
+      </form>
+    </div>
   </div>
 </div>
 

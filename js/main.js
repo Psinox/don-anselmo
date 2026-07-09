@@ -316,10 +316,17 @@ function toggleDrawer(abrir){
 }
 
 function abrirModalMayorista(){
+  resetMsjMayorista();
   document.getElementById("modal-mayorista").classList.add("visible");
 }
 function cerrarModalMayorista(){
   document.getElementById("modal-mayorista").classList.remove("visible");
+}
+function resetMsjMayorista(){
+  const r = document.getElementById("my-msj-registro");
+  const l = document.getElementById("my-msj-login");
+  if (r) r.textContent = "";
+  if (l) l.textContent = "";
 }
 
 function actualizarEstadoMayorista(){
@@ -373,7 +380,17 @@ function bindUI(){
     }
   });
 
+  /* Mayorista: tabs */
+  document.querySelectorAll(".mayorista-tab").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".mayorista-tab").forEach(b => b.classList.toggle("activo", b === btn));
+      document.querySelectorAll(".mayorista-panel").forEach(p => p.classList.toggle("activo", p.id === "mpanel-" + btn.getAttribute("data-mtab")));
+    });
+  });
+
+  /* Registro */
   const formMayorista = document.getElementById("form-mayorista");
+  const msjReg = document.getElementById("my-msj-registro");
   if (formMayorista){
     formMayorista.addEventListener("submit", (e) => {
       e.preventDefault();
@@ -383,10 +400,35 @@ function bindUI(){
         whatsapp: document.getElementById("my-whatsapp").value.trim(),
       };
       if (!datos.nombre || !datos.whatsapp) return;
-      setMayorista(datos);
-      cerrarModalMayorista();
-      actualizarEstadoMayorista();
-      formMayorista.reset();
+      const ok = agregarSolicitudMayorista(datos);
+      if (ok){
+        msjReg.innerHTML = '<span style="color:var(--verde);">Solicitud enviada. Te avisaremos cuando sea aprobada.</span>';
+        formMayorista.reset();
+      } else {
+        msjReg.innerHTML = '<span style="color:var(--alerta);">Ya hay una solicitud pendiente con ese WhatsApp.</span>';
+      }
+    });
+  }
+
+  /* Login */
+  const formLogin = document.getElementById("form-mayorista-login");
+  const msjLog = document.getElementById("my-msj-login");
+  if (formLogin){
+    formLogin.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const whatsapp = document.getElementById("my-login-whatsapp").value.trim();
+      if (!whatsapp) return;
+      const aprobados = getMayoristasAprobados();
+      const match = aprobados.find(m => m.whatsapp === whatsapp);
+      if (match){
+        setMayorista({ nombre: match.nombre, negocio: match.negocio, whatsapp: match.whatsapp, id: match.id });
+        cerrarModalMayorista();
+        actualizarEstadoMayorista();
+        formLogin.reset();
+        msjLog.textContent = "";
+      } else {
+        msjLog.innerHTML = '<span style="color:var(--alerta);">WhatsApp no encontrado. Todavia no fuiste aprobado o revisa que el numero sea correcto.</span>';
+      }
     });
   }
 }

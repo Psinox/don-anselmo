@@ -102,20 +102,84 @@ function initStoreIfEmpty() {
   }
 }
 
-/* ---------- Modo mayorista (registro simple, sin aprobación) ---------- */
+/* ---------- Modo mayorista (con aprobacion admin + historial de compras) ---------- */
 
-const MAYORISTA_KEY = "donanselmo_mayorista";
+const MAYORISTA_PENDING_KEY = "donanselmo_mayoristas_pendientes";
+const MAYORISTA_APPROVED_KEY = "donanselmo_mayoristas_aprobados";
+const MAYORISTA_SESSION_KEY = "donanselmo_mayorista_sesion";
 
 function getMayorista() {
-  return _read(MAYORISTA_KEY, null); // null | {nombre, negocio, whatsapp, fecha}
+  return _read(MAYORISTA_SESSION_KEY, null);
 }
 
 function setMayorista(datos) {
-  return _write(MAYORISTA_KEY, { ...datos, fecha: new Date().toISOString() });
+  return _write(MAYORISTA_SESSION_KEY, { ...datos, fecha: new Date().toISOString() });
 }
 
 function clearMayorista() {
-  localStorage.removeItem(MAYORISTA_KEY);
+  localStorage.removeItem(MAYORISTA_SESSION_KEY);
+}
+
+function getSolicitudesMayoristas() {
+  return _read(MAYORISTA_PENDING_KEY, []);
+}
+
+function saveSolicitudesMayoristas(list) {
+  return _write(MAYORISTA_PENDING_KEY, list);
+}
+
+function agregarSolicitudMayorista(datos) {
+  const list = getSolicitudesMayoristas();
+  if (list.find(s => s.whatsapp === datos.whatsapp)) return false;
+  const solicitud = {
+    id: "m" + Date.now().toString().slice(-8),
+    nombre: datos.nombre,
+    negocio: datos.negocio || "",
+    whatsapp: datos.whatsapp,
+    fecha: new Date().toISOString(),
+  };
+  list.push(solicitud);
+  saveSolicitudesMayoristas(list);
+  return true;
+}
+
+function getMayoristasAprobados() {
+  return _read(MAYORISTA_APPROVED_KEY, []);
+}
+
+function saveMayoristasAprobados(list) {
+  return _write(MAYORISTA_APPROVED_KEY, list);
+}
+
+function aprobarMayorista(id) {
+  const pendientes = getSolicitudesMayoristas();
+  const idx = pendientes.findIndex(s => s.id === id);
+  if (idx === -1) return false;
+  const [solicitud] = pendientes.splice(idx, 1);
+  saveSolicitudesMayoristas(pendientes);
+  const aprobados = getMayoristasAprobados();
+  aprobados.push({ ...solicitud, compras: [] });
+  saveMayoristasAprobados(aprobados);
+  return true;
+}
+
+function rechazarMayorista(id) {
+  const list = getSolicitudesMayoristas().filter(s => s.id !== id);
+  saveSolicitudesMayoristas(list);
+}
+
+function agregarCompraMayorista(mayoristaId, compra) {
+  const list = getMayoristasAprobados();
+  const m = list.find(x => x.id === mayoristaId);
+  if (!m) return false;
+  m.compras = m.compras || [];
+  m.compras.push({
+    fecha: new Date().toLocaleDateString("es-AR"),
+    total: compra.total,
+    items: compra.items,
+  });
+  saveMayoristasAprobados(list);
+  return true;
 }
 
 /* ---------- Carrito ---------- */

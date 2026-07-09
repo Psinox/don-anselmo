@@ -25,6 +25,7 @@ function mostrarPanel(){
   document.getElementById("panel-screen").classList.remove("oculto");
   renderProductosAdmin();
   renderPresupuestosAdmin();
+  renderMayoristasAdmin();
   renderAjustesForm();
   bindTabs();
   bindLogout();
@@ -988,4 +989,131 @@ function generarPDFPresupuesto(idx){
       setTimeout(() => document.body.removeChild(iframe), 1000);
     }, 300);
   };
+}
+
+/* =========================================================================
+   MAYORISTAS (aprobacion + historial de compras)
+   ========================================================================= */
+
+function renderMayoristasAdmin(){
+  const cont = document.getElementById("contenido-mayoristas");
+  if (!cont) return;
+
+  const pendientes = getSolicitudesMayoristas();
+  const aprobados = getMayoristasAprobados();
+
+  let html = "";
+
+  /* -- Pendientes -- */
+  html += '<div class="form-panel"><h3>Solicitudes pendientes</h3>';
+  if (pendientes.length === 0){
+    html += '<p style="color:#8a7a63;font-size:0.85rem;">No hay solicitudes pendientes.</p>';
+  } else {
+    html += '<div style="margin-top:10px;">';
+    pendientes.forEach(s => {
+      html += `
+        <div class="fila-admin" style="margin-bottom:8px;">
+          <div class="datos">
+            <h4>${escapeHtml(s.nombre)}</h4>
+            <span>${escapeHtml(s.negocio) || "-"} · ${escapeHtml(s.whatsapp)} · ${new Date(s.fecha).toLocaleDateString("es-AR")}</span>
+          </div>
+          <div class="acciones" style="gap:4px;">
+            <button type="button" class="btn btn-dorado" style="font-size:0.75rem;padding:4px 12px;" data-aprobar-m="${s.id}">Aprobar</button>
+            <button type="button" class="btn btn-outline" style="font-size:0.75rem;padding:4px 12px;color:var(--alerta);border-color:var(--alerta);" data-rechazar-m="${s.id}">Rechazar</button>
+          </div>
+        </div>`;
+    });
+    html += '</div>';
+  }
+  html += '</div>';
+
+  /* -- Aprobados -- */
+  html += '<div class="form-panel" style="margin-top:20px;"><h3>Mayoristas aprobados</h3>';
+  if (aprobados.length === 0){
+    html += '<p style="color:#8a7a63;font-size:0.85rem;">Todavia no hay mayoristas aprobados.</p>';
+  } else {
+    aprobados.forEach((m, i) => {
+      const compras = m.compras || [];
+      const totalGastado = compras.reduce((s, c) => s + c.total, 0);
+      html += `
+        <div class="fila-admin" style="margin-bottom:6px;">
+          <div class="datos">
+            <h4>${escapeHtml(m.nombre)}</h4>
+            <span>${escapeHtml(m.negocio) || "-"} · ${escapeHtml(m.whatsapp)} · ${new Date(m.fecha).toLocaleDateString("es-AR")}</span>
+            <span style="display:block;font-size:0.8rem;color:var(--marron);">${compras.length} compra(s) · Total: ${formatearMoneda(totalGastado)}</span>
+          </div>
+          <div class="acciones" style="gap:4px;">
+            <button type="button" class="btn btn-outline" style="font-size:0.75rem;padding:4px 10px;" data-ver-compras="${i}">Compras</button>
+          </div>
+        </div>`;
+    });
+  }
+  html += '</div>';
+
+  cont.innerHTML = html;
+
+  cont.querySelectorAll("[data-aprobar-m]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      aprobarMayorista(btn.getAttribute("data-aprobar-m"));
+      renderMayoristasAdmin();
+      mostrarToast("Mayorista aprobado");
+    });
+  });
+  cont.querySelectorAll("[data-rechazar-m]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (confirm("Rechazar esta solicitud?")){
+        rechazarMayorista(btn.getAttribute("data-rechazar-m"));
+        renderMayoristasAdmin();
+        mostrarToast("Solicitud rechazada");
+      }
+    });
+  });
+  cont.querySelectorAll("[data-ver-compras]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const idx = parseInt(btn.getAttribute("data-ver-compras"));
+      mostrarComprasMayorista(idx);
+    });
+  });
+}
+
+function mostrarComprasMayorista(idx){
+  const aprobados = getMayoristasAprobados();
+  const m = aprobados[idx];
+  if (!m) return;
+  const compras = m.compras || [];
+  let html = `
+    <div style="background:#fff;border-radius:var(--radius-lg);padding:24px;max-width:600px;margin:20px auto;">
+      <h3 style="margin-bottom:4px;">${escapeHtml(m.nombre)}</h3>
+      <p style="color:#8a7a63;font-size:0.85rem;margin-bottom:14px;">${escapeHtml(m.negocio) || "-"} · ${escapeHtml(m.whatsapp)}</p>`;
+  if (compras.length === 0){
+    html += '<p style="color:#8a7a63;">No realizo compras todavia.</p>';
+  } else {
+    compras.forEach((c, ci) => {
+      const itemsHtml = c.items.map(it => `
+        <tr>
+          <td style="padding:3px 6px;border-bottom:1px solid #eee;font-size:0.8rem;">${escapeHtml(it.producto?.nombre || it.nombre || "-")}</td>
+          <td style="padding:3px 6px;border-bottom:1px solid #eee;text-align:center;font-size:0.8rem;">x${it.cantidad || 1}</td>
+          <td style="padding:3px 6px;border-bottom:1px solid #eee;text-align:right;font-size:0.8rem;">${formatearMoneda(it.subtotal || it.precio || 0)}</td>
+        </tr>`).join("");
+      html += `
+        <div style="margin-bottom:12px;padding:10px;background:#f9f6f0;border-radius:6px;">
+          <strong style="font-size:0.85rem;">Compra #${ci+1}</strong> <span style="font-size:0.8rem;color:#8a7a63;">· ${c.fecha} · Total: ${formatearMoneda(c.total)}</span>
+          <table style="width:100%;border-collapse:collapse;margin-top:6px;">
+            <thead><tr><th style="padding:3px 6px;text-align:left;font-size:0.75rem;">Producto</th><th style="padding:3px 6px;font-size:0.75rem;">Cant</th><th style="padding:3px 6px;text-align:right;font-size:0.75rem;">Subtotal</th></tr></thead>
+            <tbody>${itemsHtml}</tbody>
+          </table>
+        </div>`;
+    });
+  }
+  html += `
+    <div style="text-align:center;margin-top:10px;">
+      <button class="btn btn-outline" id="btn-cerrar-compras">Cerrar</button>
+    </div>
+    </div>`;
+  const overlay = document.createElement("div");
+  overlay.style.cssText = "position:fixed;inset:0;z-index:800;background:rgba(16,14,12,0.55);display:flex;align-items:center;justify-content:center;overflow-y:auto;padding:20px;";
+  overlay.innerHTML = html;
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.remove(); });
+  overlay.querySelector("#btn-cerrar-compras")?.addEventListener("click", () => overlay.remove());
+  document.body.appendChild(overlay);
 }

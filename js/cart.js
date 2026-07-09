@@ -117,6 +117,22 @@ function irAWhatsapp(){
   const mensaje = construirMensajeWhatsapp();
   if (!mensaje) return;
   const settings = getSettings();
+  const mayorista = getMayorista();
+
+  /* Registrar la compra si es un mayorista aprobado */
+  if (mayorista && mayorista.id) {
+    const detalle = Carrito.detalle();
+    const items = detalle.map(l => ({
+      producto: { nombre: l.producto.nombre, id: l.producto.id },
+      cantidad: l.cantidad,
+      precio: l.precioUnit,
+      subtotal: l.subtotal,
+    }));
+    const compra = { total: Carrito.total(), items };
+    agregarCompraMayorista(mayorista.id, compra);
+  }
+
+  Carrito.vaciar();
   const url = `https://wa.me/${settings.whatsappNumero}?text=${encodeURIComponent(mensaje)}`;
   window.open(url, "_blank");
 }
