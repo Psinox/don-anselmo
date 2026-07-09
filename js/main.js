@@ -280,20 +280,30 @@ function bindTarjetas(){
     if (total < 2) return;
 
     let currentIdx = 0;
-    let startX = 0;
+    let startX = 0, startY = 0;
     let isDragging = false;
+    let isSwiped = false;
 
     function updateSlider(){
       track.style.transform = `translateX(-${currentIdx * 100}%)`;
       slider.querySelectorAll(".dot").forEach((d, i) => d.classList.toggle("activo", i === currentIdx));
     }
 
+    function goNext(){
+      currentIdx = (currentIdx + 1) % total;
+      updateSlider();
+    }
+
+    function goPrev(){
+      currentIdx = (currentIdx - 1 + total) % total;
+      updateSlider();
+    }
+
     slider.querySelectorAll(".foto-arrow").forEach(btn => {
       btn.addEventListener("click", (e) => {
         e.stopPropagation();
         const dir = parseInt(btn.getAttribute("data-dir"));
-        currentIdx = (currentIdx + dir + total) % total;
-        updateSlider();
+        if (dir > 0) goNext(); else goPrev();
       });
     });
 
@@ -305,29 +315,46 @@ function bindTarjetas(){
       });
     });
 
+    /* Swipe táctil */
     slider.addEventListener("touchstart", (e) => {
       startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
       isDragging = true;
+      isSwiped = false;
       track.style.transition = "none";
     }, { passive: true });
 
     slider.addEventListener("touchmove", (e) => {
       if (!isDragging) return;
-      const diff = e.touches[0].clientX - startX;
-      track.style.transform = `translateX(${-currentIdx * slider.offsetWidth + diff}px)`;
-    }, { passive: true });
+      const dx = e.touches[0].clientX - startX;
+      const dy = e.touches[0].clientY - startY;
+      if (Math.abs(dy) > Math.abs(dx)) { isDragging = false; return; }
+      isSwiped = true;
+      e.preventDefault();
+      const pct = (dx / slider.offsetWidth) * 100;
+      track.style.transform = `translateX(${-currentIdx * 100 + pct}%)`;
+    }, { passive: false });
 
     slider.addEventListener("touchend", (e) => {
       if (!isDragging) return;
       isDragging = false;
       track.style.transition = "transform 0.3s ease";
-      const diff = e.changedTouches[0].clientX - startX;
-      if (Math.abs(diff) > 50) {
-        if (diff < 0) currentIdx = Math.min(currentIdx + 1, total - 1);
-        else currentIdx = Math.max(currentIdx - 1, 0);
+      if (isSwiped) {
+        const dx = e.changedTouches[0].clientX - startX;
+        if (Math.abs(dx) > 40) {
+          if (dx < 0) currentIdx = Math.min(currentIdx + 1, total - 1);
+          else currentIdx = Math.max(currentIdx - 1, 0);
+        }
       }
       updateSlider();
     }, { passive: true });
+
+    /* Tap sobre la foto: avanza una imagen (mobile friendly) */
+    slider.addEventListener("click", (e) => {
+      if (e.target.closest(".foto-arrow") || e.target.closest(".dot")) return;
+      if (isSwiped) { isSwiped = false; return; }
+      goNext();
+    });
   });
 }
 
