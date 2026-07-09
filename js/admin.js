@@ -1163,7 +1163,7 @@ function renderMayoristasAdmin(){
             <span style="display:block;font-size:0.8rem;color:var(--marron);">${compras.length} compra(s) · Total: ${formatearMoneda(totalGastado)}</span>
           </div>
           <div class="acciones" style="gap:4px;">
-            <button type="button" class="btn btn-outline" style="font-size:0.75rem;padding:4px 10px;" data-ver-compras="${i}">Compras</button>
+            <button type="button" class="btn-icono" style="background:rgba(107,68,35,0.1);" data-ver-compras="${i}" aria-label="Compras">&#128722;</button>
           </div>
         </div>`;
     });
