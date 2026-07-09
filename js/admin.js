@@ -1,5 +1,15 @@
-const ADMIN_PASSWORD = "donanselmo2026";
+const ADMIN_PASSWORD_DEFAULT = "donanselmo2026";
+const ADMIN_PASS_KEY = "donanselmo_admin_pass";
 const SESSION_KEY = "donanselmo_admin_sesion";
+
+function getAdminPassword() {
+  const stored = localStorage.getItem(ADMIN_PASS_KEY);
+  return stored || ADMIN_PASSWORD_DEFAULT;
+}
+
+function setAdminPassword(pass) {
+  localStorage.setItem(ADMIN_PASS_KEY, pass);
+}
 
 let tabActiva = "productos";
 let editandoProductoId = null;
@@ -36,7 +46,7 @@ function bindLogin(){
   form.addEventListener("submit", (e) => {
     e.preventDefault();
     const val = document.getElementById("login-pass").value;
-    if (val === ADMIN_PASSWORD){
+    if (val === getAdminPassword()){
       sessionStorage.setItem(SESSION_KEY, "ok");
       mostrarPanel();
     } else {
@@ -620,6 +630,28 @@ function renderAjustesForm(){
         </div>
       </form>
     </div>
+    <div class="form-panel" style="margin-top:20px;">
+      <h3>Contrasena del panel</h3>
+      <p style="font-size:0.8rem;color:#8a7a63;margin-bottom:14px;">La contrasena actual es la que usaste para ingresar. Cambiala solo si es necesario.</p>
+      <form id="form-pass">
+        <div class="form-field">
+          <label for="aj-pass-actual">Contrasena actual</label>
+          <input type="password" id="aj-pass-actual" required autocomplete="current-password">
+        </div>
+        <div class="form-field">
+          <label for="aj-pass-nueva">Contrasena nueva</label>
+          <input type="password" id="aj-pass-nueva" required minlength="6" autocomplete="new-password">
+        </div>
+        <div class="form-field">
+          <label for="aj-pass-confirmar">Confirmar contrasena nueva</label>
+          <input type="password" id="aj-pass-confirmar" required autocomplete="new-password">
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-dorado">Cambiar contrasena</button>
+        </div>
+        <div id="aj-msj-pass" style="margin-top:8px;font-size:0.82rem;"></div>
+      </form>
+    </div>
   `;
 
   document.getElementById("form-ajustes").addEventListener("submit", (e) => {
@@ -728,6 +760,32 @@ function renderAjustesForm(){
     current.heroSubtitulo = document.getElementById("aj-hero-subtitulo").value.trim();
     saveSettings(current);
     mostrarToast("Portada guardada");
+  });
+
+  /* Password form */
+  document.getElementById("form-pass")?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const msj = document.getElementById("aj-msj-pass");
+    const actual = document.getElementById("aj-pass-actual").value;
+    const nueva = document.getElementById("aj-pass-nueva").value;
+    const confirmar = document.getElementById("aj-pass-confirmar").value;
+    if (actual !== getAdminPassword()){
+      msj.innerHTML = '<span style="color:var(--alerta);">La contrasena actual no es correcta.</span>';
+      return;
+    }
+    if (nueva !== confirmar){
+      msj.innerHTML = '<span style="color:var(--alerta);">Las contrasenas nuevas no coinciden.</span>';
+      return;
+    }
+    if (nueva.length < 6){
+      msj.innerHTML = '<span style="color:var(--alerta);">Minimo 6 caracteres.</span>';
+      return;
+    }
+    setAdminPassword(nueva);
+    msj.innerHTML = '<span style="color:var(--verde);">Contrasena cambiada correctamente.</span>';
+    document.getElementById("aj-pass-actual").value = "";
+    document.getElementById("aj-pass-nueva").value = "";
+    document.getElementById("aj-pass-confirmar").value = "";
   });
 }
 
