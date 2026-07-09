@@ -1,195 +1,112 @@
 /* =========================================================================
    DON ANSELMO — Capa de datos (store.js)
    -------------------------------------------------------------------------
-   Misma idea que "cloud-db.js" en otros proyectos: expone funciones con
-   nombre estable (getProductos, saveProductos, etc.) para que el resto del
-   código nunca sepa CÓMO se guardan los datos. Hoy el interior usa
-   localStorage. El día de mañana, cuando el cliente apruebe el demo y
-   conectemos Cloudflare Worker + KV, cambiamos solo lo de adentro de estas
-   funciones (fetch a /data en vez de localStorage) y todo lo demás sigue
-   funcionando igual.
-
-   Patrón de escritura atómica: updateProductos(mutatorFn) relee el estado
-   actual, aplica el cambio, y guarda — para cuando haya multi-tab o,
-   más adelante, multi-dispositivo con el Worker.
+   Si cloud-db.js esta cargado, las funciones que define tienen prioridad.
+   Si no, usa localStorage directamente (comportamiento original).
    ========================================================================= */
+
+/* ---------- interno: solo para fallback localStorage ---------- */
 
 const DB_KEYS = {
   productos: "donanselmo_productos",
   banners: "donanselmo_banners",
   settings: "donanselmo_settings",
-  version: "donanselmo_v",
 };
 
 function _read(key, fallback) {
-  try {
-    const raw = localStorage.getItem(key);
-    if (raw === null) return fallback;
-    return JSON.parse(raw);
-  } catch (e) {
-    console.error("store: error leyendo", key, e);
-    return fallback;
-  }
+  try { const r = localStorage.getItem(key); return r !== null ? JSON.parse(r) : fallback; }
+  catch { return fallback; }
 }
-
 function _write(key, value) {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-    return true;
-  } catch (e) {
-    console.error("store: error guardando", key, e);
-    return false;
-  }
+  try { localStorage.setItem(key, JSON.stringify(value)); return true; }
+  catch { return false; }
 }
 
 /* ---------- Productos ---------- */
 
-function getProductos() {
-  return _read(DB_KEYS.productos, SEED_PRODUCTS);
-}
-
-function saveProductos(productos) {
-  return _write(DB_KEYS.productos, productos);
-}
-
-// Escritura atómica: evita que dos ediciones se pisen (ej. dos pestañas
-// del admin abiertas al mismo tiempo).
-function updateProductos(mutatorFn) {
-  const actuales = getProductos();
-  const nuevos = mutatorFn(actuales.slice());
-  saveProductos(nuevos);
-  return nuevos;
+if (typeof getProductos === "undefined") {
+  function getProductos() { return _read(DB_KEYS.productos, SEED_PRODUCTS); }
+  function saveProductos(p) { return _write(DB_KEYS.productos, p); }
+  function updateProductos(mutatorFn) {
+    const a = getProductos(); const n = mutatorFn(a.slice()); saveProductos(n); return n;
+  }
 }
 
 /* ---------- Banners ---------- */
 
-function getBanners() {
-  return _read(DB_KEYS.banners, SEED_BANNERS);
-}
-
-function saveBanners(banners) {
-  return _write(DB_KEYS.banners, banners);
-}
-
-function updateBanners(mutatorFn) {
-  const actuales = getBanners();
-  const nuevos = mutatorFn(actuales.slice());
-  saveBanners(nuevos);
-  return nuevos;
-}
-
-/* ---------- Ajustes del negocio ---------- */
-
-function getSettings() {
-  return _read(DB_KEYS.settings, SEED_SETTINGS);
-}
-
-function saveSettings(settings) {
-  return _write(DB_KEYS.settings, settings);
-}
-
-/* ---------- Inicialización (equivalente al POST /seed) ---------- */
-
-function initStoreIfEmpty() {
-  if (localStorage.getItem(DB_KEYS.productos) === null) {
-    saveProductos(SEED_PRODUCTS);
-  }
-  if (localStorage.getItem(DB_KEYS.banners) === null) {
-    saveBanners(SEED_BANNERS);
-  }
-  if (localStorage.getItem(DB_KEYS.settings) === null) {
-    saveSettings(SEED_SETTINGS);
+if (typeof getBanners === "undefined") {
+  function getBanners() { return _read(DB_KEYS.banners, SEED_BANNERS); }
+  function saveBanners(b) { return _write(DB_KEYS.banners, b); }
+  function updateBanners(mutatorFn) {
+    const a = getBanners(); const n = mutatorFn(a.slice()); saveBanners(n); return n;
   }
 }
 
-/* ---------- Modo mayorista (con aprobacion admin + historial de compras) ---------- */
+/* ---------- Ajustes ---------- */
 
-const MAYORISTA_PENDING_KEY = "donanselmo_mayoristas_pendientes";
-const MAYORISTA_APPROVED_KEY = "donanselmo_mayoristas_aprobados";
-const MAYORISTA_SESSION_KEY = "donanselmo_mayorista_sesion";
-
-function getMayorista() {
-  return _read(MAYORISTA_SESSION_KEY, null);
+if (typeof getSettings === "undefined") {
+  function getSettings() { return _read(DB_KEYS.settings, SEED_SETTINGS); }
+  function saveSettings(s) { return _write(DB_KEYS.settings, s); }
 }
 
-function setMayorista(datos) {
-  return _write(MAYORISTA_SESSION_KEY, { ...datos, fecha: new Date().toISOString() });
+/* ---------- Inicialización ---------- */
+
+if (typeof initStoreIfEmpty === "undefined") {
+  function initStoreIfEmpty() {
+    if (localStorage.getItem(DB_KEYS.productos) === null) saveProductos(SEED_PRODUCTS);
+    if (localStorage.getItem(DB_KEYS.banners) === null) saveBanners(SEED_BANNERS);
+    if (localStorage.getItem(DB_KEYS.settings) === null) saveSettings(SEED_SETTINGS);
+  }
 }
 
-function clearMayorista() {
-  localStorage.removeItem(MAYORISTA_SESSION_KEY);
+/* ---------- Mayorista ---------- */
+
+if (typeof getMayorista === "undefined") {
+  const _M_SESSION = "donanselmo_mayorista_sesion";
+  function getMayorista() { return _read(_M_SESSION, null); }
+  function setMayorista(d) { return _write(_M_SESSION, { ...d, fecha: new Date().toISOString() }); }
+  function clearMayorista() { localStorage.removeItem(_M_SESSION); }
 }
 
-function getSolicitudesMayoristas() {
-  return _read(MAYORISTA_PENDING_KEY, []);
+if (typeof getSolicitudesMayoristas === "undefined") {
+  const _M_PEND = "donanselmo_mayoristas_pendientes";
+  function getSolicitudesMayoristas() { return _read(_M_PEND, []); }
+  function saveSolicitudesMayoristas(l) { return _write(_M_PEND, l); }
 }
 
-function saveSolicitudesMayoristas(list) {
-  return _write(MAYORISTA_PENDING_KEY, list);
+if (typeof getMayoristasAprobados === "undefined") {
+  const _M_APR = "donanselmo_mayoristas_aprobados";
+  function getMayoristasAprobados() { return _read(_M_APR, []); }
+  function saveMayoristasAprobados(l) { return _write(_M_APR, l); }
 }
 
-function agregarSolicitudMayorista(datos) {
-  const list = getSolicitudesMayoristas();
-  if (list.find(s => s.whatsapp === datos.whatsapp)) return false;
-  const solicitud = {
-    id: "m" + Date.now().toString().slice(-8),
-    nombre: datos.nombre,
-    negocio: datos.negocio || "",
-    whatsapp: datos.whatsapp,
-    fecha: new Date().toISOString(),
-  };
-  list.push(solicitud);
-  saveSolicitudesMayoristas(list);
-  return true;
+if (typeof agregarSolicitudMayorista === "undefined") {
+  function agregarSolicitudMayorista(datos) {
+    const list = getSolicitudesMayoristas();
+    if (list.find(s => s.whatsapp === datos.whatsapp)) return false;
+    list.push({ id: "m" + Date.now().toString().slice(-8), nombre: datos.nombre, negocio: datos.negocio || "", whatsapp: datos.whatsapp, fecha: new Date().toISOString() });
+    saveSolicitudesMayoristas(list);
+    return true;
+  }
+  function aprobarMayorista(id) {
+    const p = getSolicitudesMayoristas(); const i = p.findIndex(s => s.id === id);
+    if (i === -1) return false;
+    const [s] = p.splice(i, 1); saveSolicitudesMayoristas(p);
+    const a = getMayoristasAprobados(); a.push({ ...s, compras: [] }); saveMayoristasAprobados(a);
+    return true;
+  }
+  function rechazarMayorista(id) { saveSolicitudesMayoristas(getSolicitudesMayoristas().filter(s => s.id !== id)); }
+  function agregarCompraMayorista(mid, compra) {
+    const list = getMayoristasAprobados(); const m = list.find(x => x.id === mid);
+    if (!m) return false;
+    m.compras = m.compras || []; m.compras.push({ fecha: new Date().toLocaleDateString("es-AR"), total: compra.total, items: compra.items });
+    saveMayoristasAprobados(list); return true;
+  }
 }
 
-function getMayoristasAprobados() {
-  return _read(MAYORISTA_APPROVED_KEY, []);
-}
+/* ---------- Carrito (siempre localStorage) ---------- */
 
-function saveMayoristasAprobados(list) {
-  return _write(MAYORISTA_APPROVED_KEY, list);
-}
-
-function aprobarMayorista(id) {
-  const pendientes = getSolicitudesMayoristas();
-  const idx = pendientes.findIndex(s => s.id === id);
-  if (idx === -1) return false;
-  const [solicitud] = pendientes.splice(idx, 1);
-  saveSolicitudesMayoristas(pendientes);
-  const aprobados = getMayoristasAprobados();
-  aprobados.push({ ...solicitud, compras: [] });
-  saveMayoristasAprobados(aprobados);
-  return true;
-}
-
-function rechazarMayorista(id) {
-  const list = getSolicitudesMayoristas().filter(s => s.id !== id);
-  saveSolicitudesMayoristas(list);
-}
-
-function agregarCompraMayorista(mayoristaId, compra) {
-  const list = getMayoristasAprobados();
-  const m = list.find(x => x.id === mayoristaId);
-  if (!m) return false;
-  m.compras = m.compras || [];
-  m.compras.push({
-    fecha: new Date().toLocaleDateString("es-AR"),
-    total: compra.total,
-    items: compra.items,
-  });
-  saveMayoristasAprobados(list);
-  return true;
-}
-
-/* ---------- Carrito ---------- */
-
-const CART_KEY = "donanselmo_carrito";
-
-function getCarrito() {
-  return _read(CART_KEY, []); // [{productoId, cantidad}]
-}
-
-function saveCarrito(carrito) {
-  return _write(CART_KEY, carrito);
+if (typeof getCarrito === "undefined") {
+  function getCarrito() { return _read("donanselmo_carrito", []); }
+  function saveCarrito(c) { return _write("donanselmo_carrito", c); }
 }

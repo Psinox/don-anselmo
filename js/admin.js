@@ -17,6 +17,25 @@ let editandoBannerId = null;
 
 document.addEventListener("DOMContentLoaded", () => {
   initStoreIfEmpty();
+
+  if (typeof cloudInit === "function") {
+    cloudInit({
+      productos: SEED_PRODUCTS,
+      banners: SEED_BANNERS,
+      settings: SEED_SETTINGS,
+      presupuestos: [],
+      solicitudesMayoristas: [],
+      mayoristasAprobados: [],
+    }).then(actualizado => {
+      if (actualizado && sessionStorage.getItem(SESSION_KEY) === "ok") {
+        renderProductosAdmin();
+        renderPresupuestosAdmin();
+        renderMayoristasAdmin();
+        renderAjustesForm();
+      }
+    }).catch(() => {});
+  }
+
   if (sessionStorage.getItem(SESSION_KEY) === "ok"){
     mostrarPanel();
   } else {

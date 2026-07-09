@@ -1,5 +1,25 @@
 document.addEventListener("DOMContentLoaded", () => {
   initStoreIfEmpty();
+
+  /* Inicializar cloud en segundo plano (no bloquea el render) */
+  if (typeof cloudInit === "function") {
+    cloudInit({
+      productos: SEED_PRODUCTS,
+      banners: SEED_BANNERS,
+      settings: SEED_SETTINGS,
+      presupuestos: [],
+      solicitudesMayoristas: [],
+      mayoristasAprobados: [],
+    }).then(actualizado => {
+      if (actualizado) {
+        renderTextosNegocio();
+        renderLogos();
+        renderHero();
+        renderPromos();
+        renderProductos();
+      }
+    }).catch(() => {});
+  }
   Carrito.init();
   renderTextosNegocio();
   renderLogos();
