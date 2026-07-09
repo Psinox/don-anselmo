@@ -1,0 +1,161 @@
+/* =========================================================================
+   DON ANSELMO — admin.css (se suma a styles.css)
+   ========================================================================= */
+
+body.admin-body{ background: var(--crema); padding-bottom: 60px; }
+
+/* ---------- Pantalla de login ---------- */
+.login-screen{
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  background: var(--negro); padding: 24px;
+}
+.login-card{
+  background: var(--crema); border-radius: var(--radius-lg);
+  padding: 32px 26px; width: 100%; max-width: 380px; text-align: center;
+  box-shadow: var(--sombra);
+}
+.login-card img{ width: 60px; margin: 0 auto 10px; }
+.login-card h1{ font-family: var(--f-script); font-size: 2.2rem; color: var(--marron); }
+.login-card p{ font-size: 0.82rem; color: #6b5c48; margin-bottom: 20px; }
+.login-error{ color: var(--alerta); font-size: 0.8rem; margin-top: 8px; min-height: 1.2em; }
+
+/* ---------- Barra superior admin ---------- */
+.admin-topbar{
+  background: var(--negro); color: var(--crema);
+  position: sticky; top: 0; z-index: 200;
+}
+.admin-topbar .container{ display: flex; align-items: center; justify-content: space-between; height: 58px; }
+.admin-topbar .brand-text .nombre{ font-size: 1.3rem; }
+.admin-topbar .brand-text .tag{ color: var(--dorado-claro); }
+.btn-salir{ background: none; border: 1px solid var(--dorado-opaco); color: var(--crema-2); padding: 8px 14px; border-radius: var(--radius); font-size: 0.78rem; }
+
+/* ---------- Tabs (chips deslizables, mobile-first) ---------- */
+.admin-tabs{
+  display: flex; gap: 8px; overflow-x: auto; padding: 14px 0;
+  border-bottom: 1px solid rgba(107,68,35,0.15);
+}
+.admin-tabs::-webkit-scrollbar{ display: none; }
+.admin-tab{
+  flex-shrink: 0; padding: 10px 18px; border-radius: 999px;
+  border: 1.5px solid var(--marron); color: var(--marron); font-weight: 600; font-size: 0.85rem;
+  background: transparent; white-space: nowrap;
+}
+.admin-tab.activo{ background: var(--marron); color: var(--crema); }
+
+.admin-panel{ display: none; padding: 20px 0 50px; }
+.admin-panel.activo{ display: block; }
+
+.panel-header{ display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+.panel-header h2{ font-size: 1.3rem; color: var(--marron); }
+
+/* ---------- Filas de lista (productos / banners) ---------- */
+.lista-admin{ display: flex; flex-direction: column; gap: 10px; }
+.fila-admin{
+  background: #fff; border: 1px solid rgba(107,68,35,0.14); border-radius: var(--radius);
+  padding: 12px 14px; display: flex; align-items: center; gap: 12px;
+}
+.fila-admin .icono{ font-size: 1.6rem; flex-shrink: 0; width: 40px; text-align: center; }
+.fila-admin .datos{ flex: 1; min-width: 0; }
+.fila-admin .datos h4{ font-size: 0.9rem; margin: 0 0 2px; }
+.fila-admin .datos span{ font-size: 0.74rem; color: #8a7a63; }
+.fila-admin .acciones{ display: flex; gap: 6px; flex-shrink: 0; }
+.fila-admin .acciones button{
+  width: 34px; height: 34px; border-radius: 50%; border: none;
+  background: var(--crema-2); color: var(--marron); display: flex; align-items: center; justify-content: center;
+}
+.fila-admin .acciones button.eliminar{ background: rgba(180,67,46,0.12); color: var(--alerta); }
+.fila-admin.inactivo{ opacity: 0.5; }
+.chip-estado{ font-size: 0.62rem; font-weight: 700; text-transform: uppercase; padding: 2px 7px; border-radius: 3px; }
+.chip-estado.on{ background: rgba(78,122,81,0.15); color: var(--exito); }
+.chip-estado.off{ background: rgba(138,122,99,0.15); color: #8a7a63; }
+
+/* ---------- Panel de edición (form inline, mobile-first, 1 columna) ---------- */
+.form-panel{
+  background: #fff; border-radius: var(--radius-lg); border: 1px solid rgba(107,68,35,0.14);
+  padding: 18px; margin-bottom: 20px;
+}
+.form-panel h3{ font-size: 1.05rem; color: var(--marron); margin-bottom: 14px; }
+.form-grid{ display: grid; grid-template-columns: 1fr; gap: 0; }
+@media (min-width: 640px){ .form-grid.dos-col{ grid-template-columns: 1fr 1fr; gap: 0 16px; } }
+.form-actions{ display: flex; gap: 10px; margin-top: 6px; flex-wrap: wrap; }
+.checkbox-field{ display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+.checkbox-field input{ width: 18px; height: 18px; }
+.checkbox-field label{ margin: 0; font-size: 0.85rem; color: var(--texto-oscuro); font-weight: 500; }
+
+/* ---------- Preview de banner ---------- */
+.preview-label{ font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; color: #8a7a63; margin: 14px 0 8px; }
+.preview-banner-wrap{ display: flex; gap: 12px; flex-wrap: wrap; }
+.preview-banner-wrap .promo-card{ flex: 1 1 220px; min-height: 90px; }
+
+.vacio-admin{ text-align: center; padding: 30px 10px; color: #8a7a63; font-size: 0.88rem; }
+
+.toast{
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(120%);
+  background: var(--negro); color: var(--crema); padding: 12px 22px; border-radius: 999px;
+  font-size: 0.85rem; z-index: 900; transition: transform 0.25s ease;
+  border: 1px solid var(--dorado-opaco);
+}
+.toast.visible{ transform: translateX(-50%) translateY(0); }
+
+/* ---------- Categoria groups ---------- */
+.cat-group{ margin-bottom: 16px; }
+.cat-group-title{
+  font-size: 0.95rem; color: var(--marron);
+  padding: 6px 10px; background: rgba(107,68,35,0.06);
+  border-radius: var(--radius); margin-bottom: 6px;
+  font-family: var(--f-display);
+}
+
+/* ---------- Thumbnails admin ---------- */
+.admin-thumb{ width: 42px; height: 42px; border-radius: 6px; object-fit: cover; }
+.admin-thumb-wrap{ width: 42px; height: 42px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.admin-thumb.video-icon, .admin-thumb.text-icon{
+  width: 42px; height: 42px; border-radius: 6px;
+  background: var(--crema-2); display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem; font-weight: 700; color: var(--marron);
+}
+
+/* ---------- Image upload grid ---------- */
+.img-upload-grid{ display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+.img-upload-item{ display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.img-upload-preview{ width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: var(--radius); border: 1px solid rgba(107,68,35,0.14); }
+.img-upload-placeholder{
+  width: 100%; aspect-ratio: 1/1; border-radius: var(--radius);
+  border: 2px dashed rgba(107,68,35,0.2); display: flex; align-items: center; justify-content: center;
+  font-size: 0.72rem; color: #8a7a63; background: rgba(107,68,35,0.03);
+}
+.img-upload-item input[type="file"]{ font-size: 0.68rem; width: 100%; }
+.btn-img-remove{ background: none; border: none; color: var(--alerta); font-size: 0.7rem; text-decoration: underline; padding: 2px; }
+.btn-icono{
+  width: 34px; height: 34px; border-radius: 50%; border: none;
+  background: var(--crema-2); color: var(--marron);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem; font-weight: 700; cursor: pointer;
+}
+.btn-icono.eliminar{ background: rgba(180,67,46,0.12); color: var(--alerta); }
+
+/* ---------- Presupuestos ---------- */
+.presupuesto-item{
+  background: #fff; border: 1px solid rgba(107,68,35,0.14); border-radius: var(--radius);
+  padding: 12px 14px; margin-bottom: 10px;
+}
+.presupuesto-item .pres-header{ display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.presupuesto-item .pres-header h4{ font-size: 0.9rem; color: var(--marron); }
+.presupuesto-item .pres-header span{ font-size: 0.74rem; color: #8a7a63; }
+.presupuesto-item .pres-acciones{ display: flex; gap: 8px; }
+.presupuesto-item .pres-acciones button{ background: var(--marron); color: var(--crema); border: none; padding: 6px 14px; border-radius: var(--radius); font-size: 0.75rem; cursor: pointer; }
+
+/* ---------- Presupuesto form ---------- */
+.pres-producto-row{ display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+.pres-producto-row select, .pres-producto-row input{ padding: 8px; border-radius: var(--radius); border: 1.5px solid rgba(107,68,35,0.3); font-size: 0.85rem; background: #fff; }
+.pres-producto-row select:focus, .pres-producto-row input:focus{ outline: none; border-color: var(--marron); }
+
+/* ---------- Mobile optimizations ---------- */
+@media (max-width: 480px){
+  .img-upload-grid{ grid-template-columns: repeat(3,1fr); gap: 6px; }
+  .form-panel{ padding: 12px; }
+  .admin-tabs{ padding: 10px 0; }
+  .admin-tab{ padding: 8px 14px; font-size: 0.78rem; }
+  .fila-admin{ padding: 10px 12px; gap: 8px; }
+  .fila-admin .datos h4{ font-size: 0.82rem; }
+}

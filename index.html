@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Don Anselmo — Charcutería Artesanal de los Esteros del Iberá</title>
+<meta name="description" content="Escabeches, mermeladas, conservas y la línea Sabores de Caza, elaborados artesanalmente en los Esteros del Iberá.">
+<link rel="icon" href="assets/isotipo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- ================= HEADER ================= -->
+<header class="site-header">
+  <div class="container">
+    <a href="#" class="brand">
+      <img src="assets/isotipo.svg" alt="Isotipo Don Anselmo" class="isotipo">
+      <img src="assets/logotipo.svg" alt="Don Anselmo" class="logotipo">
+    </a>
+
+    <nav class="nav-desktop">
+      <ul>
+        <li><a href="#cat-charcuteria" onclick="irACategoria('charcuteria')">Charcutería</a></li>
+        <li><a href="#cat-caza" onclick="irACategoria('caza')">Sabores de Caza</a></li>
+        <li><a href="#cat-recuerdos" onclick="irACategoria('recuerdos')">Recuerdos del Iberá</a></li>
+        <li><a href="#cat-grabados" onclick="irACategoria('grabados')">Grabados</a></li>
+        <li><a href="#" data-abrir-mayorista>Mayoristas</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a href="#" data-abrir-mayorista class="icon-btn" title="Soy mayorista" aria-label="Soy mayorista">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M3 7l1.5 12h15L21 7M3 7h18M3 7l1-3h16l1 3M9 11v3M15 11v3"/></svg>
+      </a>
+      <button class="icon-btn" id="btn-carrito" aria-label="Ver carrito">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2.5 3h2l2.6 12.6a2 2 0 0 0 2 1.6h8.4a2 2 0 0 0 2-1.6L21 7H6"/></svg>
+        <span class="badge-count oculto" id="cart-badge">0</span>
+      </button>
+      <button class="icon-btn hamburger" id="btn-hamburger" aria-label="Abrir menú">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+    </div>
+  </div>
+  <nav class="nav-mobile" id="nav-mobile">
+    <ul>
+        <li><a href="#cat-charcuteria" onclick="irACategoria('charcuteria')">Charcutería</a></li>
+        <li><a href="#cat-caza" onclick="irACategoria('caza')">Sabores de Caza</a></li>
+        <li><a href="#cat-recuerdos" onclick="irACategoria('recuerdos')">Recuerdos del Iberá</a></li>
+        <li><a href="#cat-grabados" onclick="irACategoria('grabados')">Grabados</a></li>
+        <li><a href="#" data-abrir-mayorista>Mayoristas</a></li>
+    </ul>
+  </nav>
+</header>
+
+<!-- ================= PORTADA (hero) ================= -->
+<section class="hero" id="hero">
+  <div class="hero-media" id="hero-media"></div>
+  <div class="container hero-content" id="hero-content"></div>
+</section>
+
+<!-- ================= PRODUCTOS DESTACADOS ================= -->
+<section class="promos container">
+  <h2 class="promos-titulo">Productos destacados</h2>
+  <div class="promos-track" id="promos-track"></div>
+</section>
+
+<!-- ================= NAV CATEGORÍAS ================= -->
+<nav class="cat-nav">
+  <div class="container">
+    <div class="cat-track" id="cat-track"></div>
+  </div>
+</nav>
+
+<!-- ================= PRODUCTOS ================= -->
+<main class="container" id="seccion-productos">
+  <div id="productos-cont"></div>
+
+  <!-- ================= SECCIÓN MAYORISTA ================= -->
+  <section class="seccion-mayorista">
+    <h2>¿Revendés nuestros productos?</h2>
+    <p>Sumate como mayorista de Don Anselmo y accedé a precios especiales en toda la línea de charcutería, conservas y Sabores de Caza.</p>
+    <button class="btn btn-dorado" data-abrir-mayorista>Registrarme como mayorista</button>
+  </section>
+
+  <!-- ================= HISTORIA ================= -->
+  <section class="seccion-historia">
+    <img src="assets/isologo.svg" alt="Don Anselmo" class="historia-isologo">
+    <h2>De los esteros a tu mesa</h2>
+    <p>Cada frasco de Don Anselmo se elabora en pequeños lotes, con recetas tradicionales y productos de estación de los Esteros del Iberá. Nuestra línea Sabores de Caza suma piezas de caza mayor seleccionada, mientras que Recuerdos del Iberá y nuestros productos grabados te acompañan con una parte del monte correntino.</p>
+  </section>
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div>
+      <img src="assets/isologo.svg" alt="Don Anselmo" style="height:60px;margin-bottom:8px;">
+      <p data-eslogan>Charcutería y conservas artesanales de los Esteros del Iberá</p>
+      <div class="footer-social">
+        <a href="#" data-instagram target="_blank" rel="noopener" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>
+        </a>
+        <a href="#" id="wa-flotante-footer" aria-label="WhatsApp" onclick="document.getElementById('wa-flotante').click(); return false;">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        </a>
+      </div>
+    </div>
+    <div>
+      <h4>Contacto</h4>
+      <p data-ubicacion>Esteros del Iberá, Corrientes</p>
+      <p><a href="#" data-email>donanselmo.ibera@gmail.com</a></p>
+      <p data-habilitacion></p>
+    </div>
+    <div>
+      <h4>Categorías</h4>
+      <p><a href="#" onclick="irACategoria('charcuteria')">Charcutería</a></p>
+      <p><a href="#" onclick="irACategoria('caza')">Sabores de Caza</a></p>
+      <p><a href="#" onclick="irACategoria('recuerdos')">Recuerdos del Iberá</a></p>
+      <p><a href="#" onclick="irACategoria('grabados')">Productos Grabados</a></p>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <span>© <span id="anio"></span> Don Anselmo</span>
+    <a href="admin.html">Ingreso administración</a>
+  </div>
+</footer>
+
+<a href="#" id="wa-flotante" class="wa-flotante" target="_blank" rel="noopener" aria-label="Escribinos por WhatsApp">
+  <svg viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+</a>
+
+<!-- ================= OVERLAY (carrito + modal) ================= -->
+<div class="overlay" id="overlay"></div>
+
+<!-- ================= CARRITO DRAWER ================= -->
+<aside class="drawer" id="carrito-drawer">
+  <div class="drawer-header">
+    <h3>Tu pedido</h3>
+    <button class="icon-btn" id="btn-cerrar-carrito" aria-label="Cerrar carrito">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <div class="drawer-body" id="carrito-body"></div>
+  <div class="drawer-footer">
+    <div id="badge-mayorista" class="badge-mayorista oculto">
+      Precio mayorista · <span data-nombre-mayorista></span>
+      <button type="button" id="btn-salir-mayorista">salir</button>
+    </div>
+    <div class="form-field" style="margin-bottom:10px;">
+      <label for="envio-direccion" style="font-size:0.78rem;color:var(--marron);font-weight:600;">Direccion de envio (opcional)</label>
+      <input type="text" id="envio-direccion" placeholder="Calle, numero, localidad, provincia" style="font-size:0.85rem;padding:10px 12px;">
+    </div>
+    <div class="total-row">
+      <span class="label">Total</span>
+      <span class="monto" id="carrito-total">$ 0</span>
+    </div>
+    <button class="btn btn-whatsapp btn-block" id="btn-checkout-wa" disabled>Enviar pedido por WhatsApp</button>
+    <button class="btn btn-outline btn-block" id="btn-vaciar-carrito" style="margin-top:8px;">Vaciar carrito</button>
+  </div>
+</aside>
+
+<!-- ================= MODAL MAYORISTA ================= -->
+<div class="modal" id="modal-mayorista">
+  <div class="modal-card">
+    <button class="modal-cerrar" id="btn-cerrar-mayorista" aria-label="Cerrar">×</button>
+    <h3>Soy mayorista</h3>
+    <p class="sub">Registrate y accedé al instante a los precios especiales para reventa.</p>
+    <form id="form-mayorista">
+      <div class="form-field">
+        <label for="my-nombre">Nombre y apellido</label>
+        <input type="text" id="my-nombre" required>
+      </div>
+      <div class="form-field">
+        <label for="my-negocio">Nombre de tu negocio (opcional)</label>
+        <input type="text" id="my-negocio">
+      </div>
+      <div class="form-field">
+        <label for="my-whatsapp">WhatsApp</label>
+        <input type="tel" id="my-whatsapp" placeholder="Ej: 3794123456" required>
+      </div>
+      <button type="submit" class="btn btn-dorado btn-block">Activar precios mayoristas</button>
+    </form>
+  </div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/main.js"></script>
+<script>document.getElementById("anio").textContent = new Date().getFullYear();</script>
+</body>
+</html>

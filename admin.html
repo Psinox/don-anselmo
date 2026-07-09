@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Panel de administración — Don Anselmo</title>
+<link rel="icon" href="assets/isotipo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin-body">
+
+<!-- ================= LOGIN ================= -->
+<div class="login-screen" id="login-screen">
+  <div class="login-card">
+    <img src="assets/isotipo.svg" alt="Don Anselmo" style="width:60px;">
+    <h1>Don Anselmo</h1>
+    <p>Panel de administración</p>
+    <form id="form-login">
+      <div class="form-field" style="text-align:left;">
+        <label for="login-pass">Contraseña</label>
+        <input type="password" id="login-pass" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn btn-dorado btn-block">Ingresar</button>
+      <div class="login-error" id="login-error"></div>
+    </form>
+  </div>
+</div>
+
+<!-- ================= PANEL ================= -->
+<div id="panel-screen" class="oculto">
+  <header class="admin-topbar">
+    <div class="container">
+    <div style="display:flex;align-items:center;gap:8px;">
+  <img src="assets/isotipo.svg" alt="Icono Don Anselmo" style="height:32px;width:32px;">
+  
+  <div class="brand-text" style="display:flex; align-items:center; gap: 8px;">
+    <img src="assets/logotipo.svg" alt="Don Anselmo" style="height: 24px;">
+    
+    <span class="tag">Panel de administracion</span>
+  </div>
+</div>
+      <button class="btn-salir" id="btn-logout">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="admin-tabs">
+      <button class="admin-tab activo" data-tab="productos">Productos</button>
+      <button class="admin-tab" data-tab="presupuestos">Presupuestos</button>
+      <button class="admin-tab" data-tab="ajustes">Ajustes</button>
+    </div>
+
+    <!-- ---------- TAB PRODUCTOS ---------- -->
+    <section class="admin-panel activo" id="panel-productos">
+      <div class="panel-header">
+        <h2>Productos</h2>
+        <button class="btn btn-dorado" id="btn-nuevo-producto">+ Nuevo producto</button>
+      </div>
+      <div id="form-producto-cont" class="oculto"></div>
+      <div class="lista-admin" id="lista-productos"></div>
+    </section>
+
+    <!-- ---------- TAB PRESUPUESTOS ---------- -->
+    <section class="admin-panel" id="panel-presupuestos">
+      <div class="panel-header">
+        <h2>Presupuestos / PDF</h2>
+        <button class="btn btn-dorado" id="btn-nuevo-presupuesto">+ Nuevo presupuesto</button>
+      </div>
+      <div id="form-presupuesto-cont" class="oculto"></div>
+      <div id="lista-presupuestos" class="lista-admin"></div>
+    </section>
+
+    <!-- ---------- TAB AJUSTES ---------- -->
+    <section class="admin-panel" id="panel-ajustes"></section>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="js/data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

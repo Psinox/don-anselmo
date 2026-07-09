@@ -1,0 +1,14 @@
+# OS
+Thumbs.db
+.DS_Store
+Desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# No subir archivos grandes ni temporales
+*.log
+node_modules/
