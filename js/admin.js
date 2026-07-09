@@ -85,12 +85,6 @@ function escapeHtml(str){
   return div.innerHTML;
 }
 
-function leerImgBase64(file, callback){
-  const reader = new FileReader();
-  reader.onload = (e) => callback(e.target.result);
-  reader.readAsDataURL(file);
-}
-
 const CLOUD_NAME = "dmdpjzwom";
 const UPLOAD_PRESET = "don-anselmo";
 
@@ -492,14 +486,22 @@ function abrirFormBanner(id){
   tipoSelect.addEventListener("change", toggleTipoCampos);
   toggleTipoCampos();
 
-  let bannerImgB64 = b && b.imagen ? b.imagen : "";
+  let bannerImgUrl = b && b.imagen ? b.imagen : "";
   document.getElementById("bf-imagen-input")?.addEventListener("change", (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    leerImgBase64(file, (b64) => { bannerImgB64 = b64; });
+    const localUrl = URL.createObjectURL(file);
+    const preview = document.querySelector("#bf-imagen-field .img-upload-preview");
+    if (preview) preview.src = localUrl;
+    subirImgCloudinary(file, (err, url) => {
+      if (err) { mostrarToast(err); return; }
+      bannerImgUrl = url;
+      const p = document.querySelector("#bf-imagen-field .img-upload-preview");
+      if (p) p.src = url;
+    });
   });
   document.getElementById("btn-remove-banner-img")?.addEventListener("click", () => {
-    bannerImgB64 = "";
+    bannerImgUrl = "";
     const parent = document.querySelector("#bf-imagen-field .img-upload-item");
     if (parent) parent.remove();
   });
@@ -507,7 +509,7 @@ function abrirFormBanner(id){
   document.getElementById("btn-cancelar-banner").addEventListener("click", cerrarFormBanner);
   document.getElementById("form-banner").addEventListener("submit", (e) => {
     e.preventDefault();
-    guardarBanner(bannerImgB64);
+    guardarBanner(bannerImgUrl);
   });
 }
 
@@ -518,13 +520,13 @@ function cerrarFormBanner(){
   cont.innerHTML = "";
 }
 
-function guardarBanner(bannerImgB64){
+function guardarBanner(bannerImgUrl){
   const datos = {
     titulo: document.getElementById("bf-titulo").value.trim(),
     subtitulo: document.getElementById("bf-subtitulo").value.trim(),
     tipo: document.getElementById("bf-tipo").value,
     color: document.getElementById("bf-color").value,
-    imagen: document.getElementById("bf-tipo").value === "imagen" ? bannerImgB64 : "",
+    imagen: document.getElementById("bf-tipo").value === "imagen" ? bannerImgUrl : "",
     video: document.getElementById("bf-tipo").value === "video" ? document.getElementById("bf-video-url").value.trim() : "",
     categoria: document.getElementById("bf-categoria").value,
     orden: parseInt(document.getElementById("bf-orden").value) || 1,
@@ -705,38 +707,42 @@ function renderAjustesForm(){
     mostrarToast("Ajustes guardados");
   });
 
-  let isotipoB64 = s.isotipo || "";
-  let logotipoB64 = s.logotipo || "";
-  let isologoB64 = s.isologo || "";
+  let isotipoUrl = s.isotipo || "";
+  let logotipoUrl = s.logotipo || "";
+  let isologoUrl = s.isologo || "";
 
-  document.getElementById("aj-isotipo-input")?.addEventListener("change", (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    leerImgBase64(file, (b64) => { isotipoB64 = b64; });
-  });
-  document.getElementById("aj-logotipo-input")?.addEventListener("change", (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    leerImgBase64(file, (b64) => { logotipoB64 = b64; });
-  });
-  document.getElementById("aj-isologo-input")?.addEventListener("change", (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    leerImgBase64(file, (b64) => { isologoB64 = b64; });
+  ["isotipo", "logotipo", "isologo"].forEach(tipo => {
+    const input = document.getElementById(`aj-${tipo}-input`);
+    if (!input) return;
+    input.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const localUrl = URL.createObjectURL(file);
+      const preview = document.querySelector(`#aj-${tipo}-input`)?.closest(".form-field")?.querySelector(".img-upload-preview");
+      if (preview) preview.src = localUrl;
+      subirImgCloudinary(file, (err, url) => {
+        if (err) { mostrarToast(err); return; }
+        if (tipo === "isotipo") isotipoUrl = url;
+        else if (tipo === "logotipo") logotipoUrl = url;
+        else isologoUrl = url;
+        const p = document.querySelector(`#aj-${tipo}-input`)?.closest(".form-field")?.querySelector(".img-upload-preview");
+        if (p) p.src = url;
+      });
+    });
   });
 
   document.getElementById("btn-remove-isotipo")?.addEventListener("click", () => {
-    isotipoB64 = "";
+    isotipoUrl = "";
     const parent = document.querySelector("#aj-isotipo-input")?.closest(".form-field")?.querySelector(".img-upload-item");
     if (parent) parent.remove();
   });
   document.getElementById("btn-remove-logotipo")?.addEventListener("click", () => {
-    logotipoB64 = "";
+    logotipoUrl = "";
     const parent = document.querySelector("#aj-logotipo-input")?.closest(".form-field")?.querySelector(".img-upload-item");
     if (parent) parent.remove();
   });
   document.getElementById("btn-remove-isologo")?.addEventListener("click", () => {
-    isologoB64 = "";
+    isologoUrl = "";
     const parent = document.querySelector("#aj-isologo-input")?.closest(".form-field")?.querySelector(".img-upload-item");
     if (parent) parent.remove();
   });
@@ -744,9 +750,9 @@ function renderAjustesForm(){
   document.getElementById("form-logos")?.addEventListener("submit", (e) => {
     e.preventDefault();
     const current = getSettings();
-    current.isotipo = isotipoB64 || current.isotipo;
-    current.logotipo = logotipoB64 || current.logotipo;
-    current.isologo = isologoB64 || current.isologo;
+    current.isotipo = isotipoUrl || current.isotipo;
+    current.logotipo = logotipoUrl || current.logotipo;
+    current.isologo = isologoUrl || current.isologo;
     saveSettings(current);
     mostrarToast("Logos guardados");
   });
@@ -764,14 +770,22 @@ function renderAjustesForm(){
     });
   }
 
-  let heroImgB64 = s.heroImagen || "";
+  let heroImgUrl = s.heroImagen || "";
   document.getElementById("aj-hero-imagen-input")?.addEventListener("change", (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    leerImgBase64(file, (b64) => { heroImgB64 = b64; });
+    const localUrl = URL.createObjectURL(file);
+    const preview = document.querySelector("#aj-hero-imagen-field .img-upload-preview");
+    if (preview) preview.src = localUrl;
+    subirImgCloudinary(file, (err, url) => {
+      if (err) { mostrarToast(err); return; }
+      heroImgUrl = url;
+      const p = document.querySelector("#aj-hero-imagen-field .img-upload-preview");
+      if (p) p.src = url;
+    });
   });
   document.getElementById("btn-remove-hero-img")?.addEventListener("click", () => {
-    heroImgB64 = "";
+    heroImgUrl = "";
     const parent = document.querySelector("#aj-hero-imagen-field .img-upload-item");
     if (parent) parent.remove();
   });
@@ -789,7 +803,7 @@ function renderAjustesForm(){
     e.preventDefault();
     const current = getSettings();
     current.heroTipo = document.getElementById("aj-hero-tipo").value;
-    current.heroImagen = heroImgB64 || current.heroImagen;
+    current.heroImagen = heroImgUrl || current.heroImagen;
     current.heroVideo = document.getElementById("aj-hero-video-url").value.trim();
     current.heroOverlay = document.getElementById("aj-hero-overlay").checked;
     current.heroSubtitulo = document.getElementById("aj-hero-subtitulo").value.trim();
