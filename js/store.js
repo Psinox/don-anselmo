@@ -100,6 +100,7 @@ if (typeof agregarSolicitudMayorista === "undefined") {
     return true;
   }
   function rechazarMayorista(id) { saveSolicitudesMayoristas(getSolicitudesMayoristas().filter(s => s.id !== id)); }
+  function eliminarMayorista(id) { saveMayoristasAprobados(getMayoristasAprobados().filter(s => s.id !== id)); }
   function agregarCompraMayorista(mid, compra) {
     const list = getMayoristasAprobados(); const m = list.find(x => x.id === mid);
     if (!m) return false;

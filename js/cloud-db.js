@@ -232,6 +232,10 @@ function rechazarMayorista(id) {
   const list = getSolicitudesMayoristas().filter(s => s.id !== id);
   saveSolicitudesMayoristas(list);
 }
+function eliminarMayorista(id) {
+  const list = getMayoristasAprobados().filter(s => s.id !== id);
+  saveMayoristasAprobados(list);
+}
 function agregarCompraMayorista(mayoristaId, compra) {
   const list = getMayoristasAprobados();
   const m = list.find(x => x.id === mayoristaId);

@@ -1164,6 +1164,7 @@ function renderMayoristasAdmin(){
           </div>
           <div class="acciones" style="gap:4px;">
             <button type="button" class="btn-icono" style="background:rgba(107,68,35,0.1);" data-ver-compras="${i}" aria-label="Compras">&#128722;</button>
+            <button type="button" class="btn-icono" style="background:rgba(180,67,46,0.12);color:var(--alerta);" data-eliminar-m="${m.id}" aria-label="Eliminar mayorista">&#128465;</button>
           </div>
         </div>`;
     });
@@ -1192,6 +1193,16 @@ function renderMayoristasAdmin(){
     btn.addEventListener("click", () => {
       const idx = parseInt(btn.getAttribute("data-ver-compras"));
       mostrarComprasMayorista(idx);
+    });
+  });
+  cont.querySelectorAll("[data-eliminar-m]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-eliminar-m");
+      if (confirm("Eliminar este mayorista? Ya no podra acceder como mayorista.")){
+        eliminarMayorista(id);
+        renderMayoristasAdmin();
+        mostrarToast("Mayorista eliminado");
+      }
     });
   });
 }
