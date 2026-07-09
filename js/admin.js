@@ -305,6 +305,18 @@ function abrirFormProducto(id){
         parent.appendChild(removeBtn);
         removeBtn.addEventListener("click", () => quitarImgPreview(idx));
       }
+
+      /* Mostrar dimensiones de la imagen */
+      const dimsSpan = parent.querySelector(".img-dims");
+      const img = new Image();
+      img.onload = () => {
+        const dimsEl = dimsSpan || document.createElement("span");
+        dimsEl.className = "img-dims";
+        dimsEl.textContent = `${img.naturalWidth} x ${img.naturalHeight} px`;
+        if (!dimsSpan) parent.appendChild(dimsEl);
+      };
+      img.src = localUrl;
+
       guardarImagenProducto(idx, localUrl);
       _uploadingCount++;
       const btnGuardar = cont.querySelector("#form-producto button[type='submit']");

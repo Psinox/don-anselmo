@@ -171,6 +171,7 @@ body.admin-body.dark-mode{
 }
 .img-upload-item input[type="file"]{ font-size: 0.68rem; width: 100%; color: var(--adm-text); }
 .btn-img-remove{ background: none; border: none; color: var(--alerta); font-size: 0.7rem; text-decoration: underline; padding: 2px; }
+.img-dims{ font-size: 0.6rem; color: var(--adm-muted); line-height: 1.2; }
 .btn-icono{
   width: 34px; height: 34px; border-radius: 50%; border: none;
   background: var(--adm-surface-2); color: var(--adm-heading);
