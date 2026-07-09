@@ -239,9 +239,9 @@ function tarjetaProducto(p, esMayorista){
         </div>
         ${sinStock ? '<p class="sin-stock-msg">Producto sin stock</p>' : `
         <div class="stepper">
-          <button type="button" data-accion="restar">&#10005;</button>
+          <button type="button" data-accion="restar">&minus;</button>
           <input type="number" min="1" value="1" data-cant readonly>
-          <button type="button" data-accion="sumar">&#10003;</button>
+          <button type="button" data-accion="sumar">+</button>
         </div>
         <button type="button" class="btn-agregar" data-agregar>Agregar</button>`}
       </div>

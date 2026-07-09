@@ -1138,8 +1138,8 @@ function renderMayoristasAdmin(){
             <span>${escapeHtml(s.negocio) || "-"} · ${escapeHtml(s.whatsapp)} · ${new Date(s.fecha).toLocaleDateString("es-AR")}</span>
           </div>
           <div class="acciones" style="gap:4px;">
-            <button type="button" class="btn btn-dorado" style="font-size:0.75rem;padding:4px 12px;" data-aprobar-m="${s.id}">Aprobar</button>
-            <button type="button" class="btn btn-outline" style="font-size:0.75rem;padding:4px 12px;color:var(--alerta);border-color:var(--alerta);" data-rechazar-m="${s.id}">Rechazar</button>
+            <button type="button" class="btn-icono" style="background:rgba(78,122,81,0.12);color:var(--exito);font-size:1rem;" data-aprobar-m="${s.id}" aria-label="Aprobar">&#10003;</button>
+            <button type="button" class="btn-icono" style="background:rgba(180,67,46,0.12);color:var(--alerta);font-size:1rem;" data-rechazar-m="${s.id}" aria-label="Rechazar">&#10005;</button>
           </div>
         </div>`;
     });
