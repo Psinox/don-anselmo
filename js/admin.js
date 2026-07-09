@@ -91,6 +91,25 @@ function leerImgBase64(file, callback){
   reader.readAsDataURL(file);
 }
 
+const CLOUD_NAME = "dmdpjzwom";
+const UPLOAD_PRESET = "don-anselmo";
+
+function subirImgCloudinary(file, cb){
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", UPLOAD_PRESET);
+  formData.append("folder", "don-anselmo");
+  fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
+    method: "POST", body: formData,
+  })
+    .then(r => r.json())
+    .then(res => {
+      if (res.secure_url) cb(null, res.secure_url);
+      else cb("Error al subir imagen: " + (res.error?.message || "desconocido"));
+    })
+    .catch(err => cb("Error de red al subir imagen"));
+}
+
 /* =========================================================================
    PRODUCTOS
    ========================================================================= */
@@ -200,7 +219,7 @@ function abrirFormProducto(id){
           </div>
         </div>
         <div class="form-field">
-          <label>Imagenes del producto (hasta 4, se suben como base64)</label>
+          <label>Imagenes del producto (hasta 4, se suben a Cloudinary)</label>
           <div id="pf-imagenes-cont" class="img-upload-grid">
             ${[0,1,2,3].map(i => `
               <div class="img-upload-item">
@@ -232,23 +251,38 @@ function abrirFormProducto(id){
     input.addEventListener("change", (e) => {
       const file = e.target.files[0];
       if (!file) return;
-      leerImgBase64(file, (b64) => {
-        const idx = input.getAttribute("data-idx");
-        const placeholder = cont.querySelector(`.img-upload-placeholder[data-idx="${idx}"]`);
-        const existing = cont.querySelector(`.img-upload-preview[data-idx="${idx}"]`);
-        const parent = input.closest(".img-upload-item");
-        if (existing) existing.src = b64;
-        else if (placeholder) {
-          placeholder.outerHTML = `<img src="${b64}" class="img-upload-preview" data-idx="${idx}">`;
-          const removeBtn = document.createElement("button");
-          removeBtn.type = "button";
-          removeBtn.className = "btn-img-remove";
-          removeBtn.textContent = "Quitar";
-          removeBtn.dataset.idx = idx;
-          parent.appendChild(removeBtn);
-          removeBtn.addEventListener("click", () => quitarImgPreview(idx));
+      const idx = input.getAttribute("data-idx");
+      const placeholder = cont.querySelector(`.img-upload-placeholder[data-idx="${idx}"]`);
+      const existing = cont.querySelector(`.img-upload-preview[data-idx="${idx}"]`);
+      const parent = input.closest(".img-upload-item");
+
+      const localUrl = URL.createObjectURL(file);
+      if (existing) existing.src = localUrl;
+      else if (placeholder) {
+        placeholder.outerHTML = `<img src="${localUrl}" class="img-upload-preview" data-idx="${idx}">`;
+        const removeBtn = document.createElement("button");
+        removeBtn.type = "button";
+        removeBtn.className = "btn-img-remove";
+        removeBtn.textContent = "Quitar";
+        removeBtn.dataset.idx = idx;
+        parent.appendChild(removeBtn);
+        removeBtn.addEventListener("click", () => quitarImgPreview(idx));
+      }
+      guardarImagenProducto(idx, localUrl);
+      _uploadingCount++;
+      const btnGuardar = cont.querySelector("#form-producto button[type='submit']");
+      if (btnGuardar) btnGuardar.disabled = true;
+
+      subirImgCloudinary(file, (err, url) => {
+        _uploadingCount--;
+        if (btnGuardar && _uploadingCount <= 0) btnGuardar.disabled = false;
+        if (err) {
+          mostrarToast("Error al subir: " + err);
+          return;
         }
-        guardarImagenProducto(idx, b64);
+        guardarImagenProducto(idx, url);
+        const img = cont.querySelector(`.img-upload-preview[data-idx="${idx}"]`);
+        if (img) img.src = url;
       });
     });
   });
@@ -265,6 +299,7 @@ function abrirFormProducto(id){
 }
 
 const _imgCache = {};
+let _uploadingCount = 0;
 
 function guardarImagenProducto(idx, b64){
   _imgCache[idx] = b64;
