@@ -127,7 +127,7 @@ function escapeHtml(str){
   return div.innerHTML;
 }
 
-const CLOUD_NAME = "dmdpjzwom";
+const CLOUD_NAME = "dmdpzjwom";
 const UPLOAD_PRESET = "don-anselmo";
 
 function subirImgCloudinary(file, cb){
