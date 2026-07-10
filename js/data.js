@@ -20,7 +20,7 @@ const SEED_BANNERS = [
     id: "b1", activo: true, orden: 1,
     titulo: "Elaboracion artesanal, de nuestro monte a tu mesa",
     subtitulo: "Conservas, escabeches y mermeladas hechas en los Esteros del Ibera",
-    categoria: "charcuteria",
+    categoria: "conservas",
     tipo: "texto", color: "cuero",
     imagen: "", video: "",
   },
@@ -43,30 +43,62 @@ const SEED_BANNERS = [
 ];
 
 const SEED_PRODUCTS = [
-  { id: "p01", categoria: "charcuteria", nombre: "Berenjena al Escabeche", descripcion: "Berenjenas en escabeche casero, maceradas con especias del monte.", unidad: "gramos", cantidad: 300, precioMinorista: 3800, precioMayorista: 2900, activo: true, imagenes: [] },
-  { id: "p02", categoria: "charcuteria", nombre: "Morron Asado en Vinagre", descripcion: "Morrones asados a las brasas y encurtidos en vinagre de vino.", unidad: "gramos", cantidad: 300, precioMinorista: 3900, precioMayorista: 3000, activo: true, imagenes: [] },
-  { id: "p03", categoria: "charcuteria", nombre: "Sal Aromatizada del Ibera", descripcion: "Sal de mesa aromatizada con hierbas y especias de la region.", unidad: "gramos", cantidad: 150, precioMinorista: 2600, precioMayorista: 1900, activo: true, imagenes: [] },
-  { id: "p04", categoria: "charcuteria", nombre: "Mermelada de Naranja", descripcion: "Mermelada artesanal de naranja, coccion lenta a fuego de lena.", unidad: "gramos", cantidad: 350, precioMinorista: 3400, precioMayorista: 2600, activo: true, imagenes: [] },
-  { id: "p05", categoria: "charcuteria", nombre: "Mermelada de Zapallo", descripcion: "Mermelada casera de zapallo con un toque de especias dulces.", unidad: "gramos", cantidad: 350, precioMinorista: 3400, precioMayorista: 2600, activo: true, imagenes: [] },
-  { id: "p06", categoria: "charcuteria", nombre: "Mermelada de Frutilla", descripcion: "Mermelada artesanal de frutilla, elaborada en pequenos lotes.", unidad: "gramos", cantidad: 350, precioMinorista: 3400, precioMayorista: 2600, activo: true, imagenes: [] },
-  { id: "p07", categoria: "charcuteria", nombre: "Ajos Confitados", descripcion: "Dientes de ajo confitados en aceite de oliva con hierbas.", unidad: "gramos", cantidad: 250, precioMinorista: 4200, precioMayorista: 3300, activo: true, imagenes: [] },
-  { id: "p08", categoria: "charcuteria", nombre: "Pickles de Pepino", descripcion: "Pepinos encurtidos estilo pickle, receta tradicional Don Anselmo.", unidad: "gramos", cantidad: 300, precioMinorista: 3200, precioMayorista: 2400, activo: true, imagenes: [] },
-  { id: "p09", categoria: "charcuteria", nombre: "Mermelada de Cebolla", descripcion: "Mermelada agridulce de cebolla, ideal para carnes y quesos.", unidad: "gramos", cantidad: 350, precioMinorista: 3600, precioMayorista: 2800, activo: true, imagenes: [] },
-  { id: "p10", categoria: "charcuteria", nombre: "Salame Artesanal", descripcion: "Salame de elaboracion artesanal, estacionado en secadero propio.", unidad: "kilogramos", cantidad: 0.5, precioMinorista: 9800, precioMayorista: 7900, activo: true, imagenes: [] },
-  { id: "p11", categoria: "caza", nombre: "Escabeche de Ciervo Axis", descripcion: "Receta tradicional de caza seleccionada. Carne, vinagre, aceite, cebolla, morron, zanahoria, ajo, laurel y pimienta.", unidad: "gramos", cantidad: 500, precioMinorista: 7900, precioMayorista: 6200, activo: true, imagenes: [] },
-  { id: "p12", categoria: "caza", nombre: "Escabeche de Jabali", descripcion: "Escabeche tradicional de jabali de monte.", unidad: "gramos", cantidad: 500, precioMinorista: 7900, precioMayorista: 6200, activo: true, imagenes: [] },
-  { id: "p13", categoria: "recuerdos", nombre: "Cuadro Pintado a Mano - Fauna del Ibera", descripcion: "Cuadro artesanal pintado a mano, motivos de la fauna autoctona.", unidad: "unidad", cantidad: 1, precioMinorista: 18500, precioMayorista: 14500, activo: true, imagenes: [] },
-  { id: "p14", categoria: "recuerdos", nombre: "Taza Esteros del Ibera", descripcion: "Taza de ceramica con diseno exclusivo de los Esteros del Ibera.", unidad: "unidad", cantidad: 1, precioMinorista: 6500, precioMayorista: 4900, activo: true, imagenes: [] },
-  { id: "p15", categoria: "recuerdos", nombre: "Mate Ibera Premium", descripcion: "Mate de calabaza forrado en cuero, terminacion premium.", unidad: "unidad", cantidad: 1, precioMinorista: 11500, precioMayorista: 8900, activo: true, imagenes: [] },
-  { id: "p16", categoria: "recuerdos", nombre: "Remera Don Anselmo", descripcion: "Remera de algodon con logo Don Anselmo. Talles S a XL.", unidad: "unidad", cantidad: 1, precioMinorista: 9800, precioMayorista: 7500, activo: true, imagenes: [] },
-  { id: "p17", categoria: "recuerdos", nombre: "Gorra Bordada Ibera", descripcion: "Gorra bordada con el emblema de los Esteros del Ibera.", unidad: "unidad", cantidad: 1, precioMinorista: 8200, precioMayorista: 6300, activo: true, imagenes: [] },
-  { id: "p18", categoria: "grabados", nombre: "Tabla para Picar Grabada", descripcion: "Tabla de madera nativa con grabado personalizado a pedido.", unidad: "unidad", cantidad: 1, precioMinorista: 14500, precioMayorista: 11200, activo: true, imagenes: [] },
-  { id: "p19", categoria: "grabados", nombre: "Cuchillo Grabado Artesanal", descripcion: "Cuchillo criollo con mango de asta y grabado artesanal.", unidad: "unidad", cantidad: 1, precioMinorista: 21500, precioMayorista: 16900, activo: true, imagenes: [] },
+  /* ---- Sabores de Caza ---- */
+  { id: "p11", categoria: "caza", nombre: "Escabeche de Ciervo Axis", descripcion: "Receta tradicional de caza seleccionada. Carne, vinagre, aceite, cebolla, morron, zanahoria, ajo, laurel y pimienta.", activo: true, imagenes: [], variantes: [{ id: "v1", unidad: "gramos", cantidad: 500, precioMinorista: 7900, precioMayorista: 6200 }] },
+  { id: "p12", categoria: "caza", nombre: "Escabeche de Jabali", descripcion: "Escabeche tradicional de jabali de monte.", activo: true, imagenes: [], variantes: [{ id: "v1", unidad: "gramos", cantidad: 500, precioMinorista: 7900, precioMayorista: 6200 }] },
+
+  /* ---- Conservas (vegetales cosechados) ---- */
+  { id: "p01", categoria: "conservas", nombre: "Berenjena al Escabeche", descripcion: "Berenjenas en escabeche casero, maceradas con especias del monte.", activo: true, imagenes: [], variantes: [{ id: "v1", unidad: "gramos", cantidad: 300, precioMinorista: 3800, precioMayorista: 2900 }] },
+  { id: "p02", categoria: "conservas", nombre: "Morron Asado en Vinagre", descripcion: "Morrones asados a las brasas y encurtidos en vinagre de vino.", activo: true, imagenes: [], variantes: [{ id: "v1", unidad: "gramos", cantidad: 300, precioMinorista: 3900, precioMayorista: 3000 }] },
+  { id: "p03", categoria: "conservas", nombre: "Sal Aromatizada del Ibera", descripcion: "Sal de mesa aromatizada con hierbas y especias de la region.", activo: true, imagenes: [], variantes: [{ id: "v1", unidad: "gramos", cantidad: 150, precioMinorista: 2600, precioMayorista: 1900 }] },
+  { id: "p07", categoria: "conservas", nombre: "Ajos Confitados", descripcion: "Dientes de ajo confitados en aceite de oliva con hierbas.", activo: true, imagenes: [], variantes: [{ id: "v1", unidad: "gramos", cantidad: 250, precioMinorista: 4200, precioMayorista: 3300 }] },
+  { id: "p08", categoria: "conservas", nombre: "Pickles de Pepino", descripcion: "Pepinos encurtidos estilo pickle, receta tradicional Don Anselmo.", activo: true, imagenes: [], variantes: [{ id: "v1", unidad: "gramos", cantidad: 300, precioMinorista: 3200, precioMayorista: 2400 }] },
+
+  /* ---- Mermeladas ---- */
+  { id: "p04", categoria: "mermeladas", nombre: "Mermelada de Naranja", descripcion: "Mermelada artesanal de naranja, coccion lenta a fuego de lena.", activo: true, imagenes: [], variantes: [{ id: "v1", unidad: "gramos", cantidad: 350, precioMinorista: 3400, precioMayorista: 2600 }] },
+  { id: "p05", categoria: "mermeladas", nombre: "Mermelada de Zapallo", descripcion: "Mermelada casera de zapallo con un toque de especias dulces.", activo: true, imagenes: [], variantes: [{ id: "v1", unidad: "gramos", cantidad: 350, precioMinorista: 3400, precioMayorista: 2600 }] },
+  { id: "p06", categoria: "mermeladas", nombre: "Mermelada de Frutilla", descripcion: "Mermelada artesanal de frutilla, elaborada en pequenos lotes.", activo: true, imagenes: [], variantes: [{ id: "v1", unidad: "gramos", cantidad: 350, precioMinorista: 3400, precioMayorista: 2600 }] },
+  { id: "p09", categoria: "mermeladas", nombre: "Mermelada de Cebolla", descripcion: "Mermelada agridulce de cebolla, ideal para carnes y quesos.", activo: true, imagenes: [], variantes: [{ id: "v1", unidad: "gramos", cantidad: 350, precioMinorista: 3600, precioMayorista: 2800 }] },
+
+  /* ---- Charcuteria curada ---- */
+  { id: "p10", categoria: "charcuteria", nombre: "Salame Artesanal", descripcion: "Salame de elaboracion artesanal, estacionado en secadero propio.", activo: true, imagenes: [], variantes: [{ id: "v1", unidad: "kilogramos", cantidad: 0.5, precioMinorista: 9800, precioMayorista: 7900 }] },
+
+  /* ---- Recuerdos del Ibera ---- */
+  { id: "p13", categoria: "recuerdos", nombre: "Cuadro Pintado a Mano - Fauna del Ibera", descripcion: "Cuadro artesanal pintado a mano, motivos de la fauna autoctona.", activo: true, imagenes: [], variantes: [{ id: "v1", unidad: "unidad", cantidad: 1, precioMinorista: 18500, precioMayorista: 14500 }] },
+  { id: "p14", categoria: "recuerdos", nombre: "Taza Esteros del Ibera", descripcion: "Taza de ceramica con diseno exclusivo de los Esteros del Ibera.", activo: true, imagenes: [], variantes: [{ id: "v1", unidad: "unidad", cantidad: 1, precioMinorista: 6500, precioMayorista: 4900 }] },
+  { id: "p15", categoria: "recuerdos", nombre: "Mate Ibera Premium", descripcion: "Mate de calabaza forrado en cuero, terminacion premium.", activo: true, imagenes: [], variantes: [{ id: "v1", unidad: "unidad", cantidad: 1, precioMinorista: 11500, precioMayorista: 8900 }] },
+  { id: "p16", categoria: "recuerdos", nombre: "Remera Don Anselmo", descripcion: "Remera de algodon con logo Don Anselmo. Talles S a XL.", activo: true, imagenes: [], variantes: [{ id: "v1", unidad: "unidad", cantidad: 1, precioMinorista: 9800, precioMayorista: 7500 }] },
+  { id: "p17", categoria: "recuerdos", nombre: "Gorra Bordada Ibera", descripcion: "Gorra bordada con el emblema de los Esteros del Ibera.", activo: true, imagenes: [], variantes: [{ id: "v1", unidad: "unidad", cantidad: 1, precioMinorista: 8200, precioMayorista: 6300 }] },
+
+  /* ---- Grabados / Personalizados ---- */
+  { id: "p18", categoria: "grabados", nombre: "Tabla para Picar Grabada", descripcion: "Tabla de madera nativa con grabado personalizado a pedido.", activo: true, imagenes: [], variantes: [{ id: "v1", unidad: "unidad", cantidad: 1, precioMinorista: 14500, precioMayorista: 11200 }] },
+  { id: "p19", categoria: "grabados", nombre: "Cuchillo Grabado Artesanal", descripcion: "Cuchillo criollo con mango de asta y grabado artesanal.", activo: true, imagenes: [], variantes: [{ id: "v1", unidad: "unidad", cantidad: 1, precioMinorista: 21500, precioMayorista: 16900 }] },
 ];
 
 const CATEGORIAS = [
-  { id: "charcuteria", nombre: "Charcuteria", icono: "" },
+  { id: "conservas", nombre: "Conservas", icono: "" },
+  { id: "mermeladas", nombre: "Mermeladas", icono: "" },
   { id: "caza", nombre: "Sabores de Caza", icono: "" },
+  { id: "charcuteria", nombre: "Charcuteria Curada", icono: "" },
+  { id: "panificados", nombre: "Panificados y Snacks", icono: "" },
   { id: "recuerdos", nombre: "Recuerdos del Ibera", icono: "" },
-  { id: "grabados", nombre: "Productos Grabados", icono: "" },
+  { id: "grabados", nombre: "Grabados / Personalizados", icono: "" },
 ];
+
+/* Normaliza productos viejos (sin variantes) al nuevo formato */
+function normalizarVariantes(p) {
+  if (!p) return p;
+  if (p.variantes && p.variantes.length > 0) return p;
+  return {
+    ...p,
+    variantes: [{
+      id: "v_default",
+      unidad: p.unidad || "unidad",
+      cantidad: p.cantidad !== undefined ? p.cantidad : 1,
+      precioMinorista: p.precioMinorista || 0,
+      precioMayorista: p.precioMayorista || 0,
+    }]
+  };
+}
+
+function getVarianteDefault(p) { return normalizarVariantes(p).variantes[0]; }

@@ -165,14 +165,15 @@ function renderProductosAdmin(){
     if (items.length === 0) return;
     html += `<div class="cat-group"><h4 class="cat-group-title">${cat.nombre}</h4>`;
     items.forEach(p => {
-      const medida = p.unidad === "unidad" ? "1 unidad" : `${p.cantidad}${p.unidad === "kilogramos" ? "kg" : "g"}`;
+      const norm = normalizarVariantes(p);
+      const variantesStr = norm.variantes.map(v => `${formatearMedida(v)}: ${formatearMoneda(v.precioMinorista)} (min) / ${formatearMoneda(v.precioMayorista)} (may)`).join(" · ");
       const preview = p.imagenes && p.imagenes[0] ? `<img src="${p.imagenes[0]}" class="admin-thumb">` : "";
       html += `
         <div class="fila-admin ${p.activo ? '' : 'inactivo'}">
           <div class="admin-thumb-wrap">${preview}</div>
           <div class="datos">
             <h4>${escapeHtml(p.nombre)}</h4>
-            <span>${medida} · ${formatearMoneda(p.precioMinorista)} (min) / ${formatearMoneda(p.precioMayorista)} (may)
+            <span>${variantesStr}
               <span class="chip-estado ${p.activo ? 'on' : 'off'}">${p.activo ? 'Activo' : 'Oculto'}</span>
               ${p.sinStock ? '<span class="chip-estado off" style="background:rgba(180,67,46,0.15);color:var(--alerta);">Sin stock</span>' : ""}
             </span>
@@ -230,29 +231,29 @@ function abrirFormProducto(id){
           <label for="pf-desc">Descripcion corta</label>
           <textarea id="pf-desc">${p ? escapeHtml(p.descripcion) : ''}</textarea>
         </div>
-        <div class="form-grid dos-col">
-          <div class="form-field">
-            <label for="pf-unidad">Se vende por</label>
-            <select id="pf-unidad">
-              <option value="unidad" ${p && p.unidad === 'unidad' ? 'selected' : ''}>Unidad</option>
-              <option value="gramos" ${p && p.unidad === 'gramos' ? 'selected' : ''}>Gramos</option>
-              <option value="kilogramos" ${p && p.unidad === 'kilogramos' ? 'selected' : ''}>Kilogramos</option>
-            </select>
+        <div class="form-field">
+          <label>Variantes (presentaciones y precios)</label>
+          <div id="pf-variantes">
+            ${function(){
+              const variantes = (p ? normalizarVariantes(p).variantes : [{id:"v_default", unidad:"gramos", cantidad:300, precioMinorista:"", precioMayorista:""}]);
+              return variantes.map((v, i) => `
+                <div class="variante-row" data-idx="${i}">
+                  <div class="variante-fields">
+                    <select name="v-unidad">
+                      <option value="unidad" ${v.unidad==="unidad"?"selected":""}>Unidad</option>
+                      <option value="gramos" ${v.unidad==="gramos"?"selected":""}>Gramos</option>
+                      <option value="kilogramos" ${v.unidad==="kilogramos"?"selected":""}>Kilogramos</option>
+                    </select>
+                    <input type="number" name="v-cantidad" step="0.01" min="0" value="${v.cantidad}" placeholder="Cant.">
+                    <input type="number" name="v-precio-min" min="0" required value="${v.precioMinorista}" placeholder="P. minorista">
+                    <input type="number" name="v-precio-may" min="0" required value="${v.precioMayorista}" placeholder="P. mayorista">
+                  </div>
+                  ${variantes.length > 1 ? `<button type="button" class="btn-icono variante-remove" style="background:rgba(180,67,46,0.12);color:var(--alerta);">X</button>` : ""}
+                </div>
+              `).join("");
+            }()}
           </div>
-          <div class="form-field">
-            <label for="pf-cantidad">Cantidad (peso/medida)</label>
-            <input type="number" id="pf-cantidad" step="0.01" min="0" value="${p ? p.cantidad : 1}">
-          </div>
-        </div>
-        <div class="form-grid dos-col">
-          <div class="form-field">
-            <label for="pf-precio-min">Precio minorista</label>
-            <input type="number" id="pf-precio-min" min="0" required value="${p ? p.precioMinorista : ''}">
-          </div>
-          <div class="form-field">
-            <label for="pf-precio-may">Precio mayorista</label>
-            <input type="number" id="pf-precio-may" min="0" required value="${p ? p.precioMayorista : ''}">
-          </div>
+          <button type="button" class="btn btn-outline" id="btn-add-variante" style="margin-top:6px;font-size:0.75rem;">+ Agregar variante</button>
         </div>
         <div class="form-field">
           <label>Imagenes del producto (hasta 4, se suben a Cloudinary)</label>
@@ -340,6 +341,35 @@ function abrirFormProducto(id){
     btn.addEventListener("click", () => quitarImgPreview(btn.getAttribute("data-idx")));
   });
 
+  /* Add variant row */
+  document.getElementById("btn-add-variante").addEventListener("click", () => {
+    const cont = document.getElementById("pf-variantes");
+    const idx = cont.children.length;
+    const row = document.createElement("div");
+    row.className = "variante-row";
+    row.dataset.idx = idx;
+    row.innerHTML = `
+      <div class="variante-fields">
+        <select name="v-unidad">
+          <option value="unidad">Unidad</option>
+          <option value="gramos" selected>Gramos</option>
+          <option value="kilogramos">Kilogramos</option>
+        </select>
+        <input type="number" name="v-cantidad" step="0.01" min="0" value="300" placeholder="Cant.">
+        <input type="number" name="v-precio-min" min="0" required value="" placeholder="P. minorista">
+        <input type="number" name="v-precio-may" min="0" required value="" placeholder="P. mayorista">
+      </div>
+      <button type="button" class="btn-icono variante-remove" style="background:rgba(180,67,46,0.12);color:var(--alerta);">X</button>
+    `;
+    cont.appendChild(row);
+    row.querySelector(".variante-remove").addEventListener("click", () => row.remove());
+  });
+
+  /* Remove variant rows */
+  document.querySelectorAll(".variante-remove").forEach(btn => {
+    btn.addEventListener("click", () => btn.closest(".variante-row").remove());
+  });
+
   document.getElementById("btn-cancelar-producto").addEventListener("click", cerrarFormProducto);
   document.getElementById("form-producto").addEventListener("submit", (e) => {
     e.preventDefault();
@@ -376,23 +406,36 @@ function cerrarFormProducto(){
 }
 
 function guardarProducto(){
-  // Para cada uno de los 4 casilleros: si se subio una imagen nueva, usarla;
-  // si se saco explicitamente (quitar), no incluirla; si no se toco, mantener la que ya tenia el producto.
   const existente = editandoProductoId ? getProductos().find(p => p.id === editandoProductoId) : null;
   const imagenesPrevias = (existente && existente.imagenes) || [];
   const imagenes = [0, 1, 2, 3].map(i => {
-    if (Object.prototype.hasOwnProperty.call(_imgCache, i)) return _imgCache[i]; // string nueva, o null si se saco
-    return imagenesPrevias[i] || null; // no se toco: conservar la que ya estaba
+    if (Object.prototype.hasOwnProperty.call(_imgCache, i)) return _imgCache[i];
+    return imagenesPrevias[i] || null;
   }).filter(Boolean);
+
+  /* Read variants from form */
+  const varianteRows = document.querySelectorAll("#pf-variantes .variante-row");
+  const variantes = Array.from(varianteRows).map((row, i) => {
+    const fields = row.querySelectorAll("input, select");
+    return {
+      id: "v" + (i + 1),
+      unidad: fields[0].value,
+      cantidad: parseFloat(fields[1].value) || 1,
+      precioMinorista: parseInt(fields[2].value) || 0,
+      precioMayorista: parseInt(fields[3].value) || 0,
+    };
+  });
+
+  if (variantes.length === 0) {
+    mostrarToast("Debe tener al menos una variante");
+    return;
+  }
 
   const datos = {
     nombre: document.getElementById("pf-nombre").value.trim(),
     categoria: document.getElementById("pf-categoria").value,
     descripcion: document.getElementById("pf-desc").value.trim(),
-    unidad: document.getElementById("pf-unidad").value,
-    cantidad: parseFloat(document.getElementById("pf-cantidad").value) || 1,
-    precioMinorista: parseInt(document.getElementById("pf-precio-min").value) || 0,
-    precioMayorista: parseInt(document.getElementById("pf-precio-may").value) || 0,
+    variantes: variantes,
     imagenes: imagenes,
     activo: document.getElementById("pf-activo").checked,
     sinStock: document.getElementById("pf-sin-stock").checked,
@@ -982,7 +1025,7 @@ function abrirFormPresupuesto(){
             <div class="pres-producto-row">
               <select class="pres-prod-select" style="flex:1;">
                 <option value="">Seleccionar producto...</option>
-                ${productos.map(p => `<option value="${p.id}" data-precio="${p.precioMinorista}">${escapeHtml(p.nombre)} - ${formatearMoneda(p.precioMinorista)}</option>`).join("")}
+                ${productos.map(p => { const v = getVarianteDefault(p); return `<option value="${p.id}" data-precio="${v.precioMinorista}">${escapeHtml(p.nombre)} - ${formatearMoneda(v.precioMinorista)}</option>`; }).join("")}
               </select>
               <input type="number" class="pres-prod-cant" value="1" min="1" style="width:50px;">
               <button type="button" class="btn-icono pres-remove-row" style="background:rgba(180,67,46,0.12);color:var(--alerta);">-</button>
@@ -1006,7 +1049,7 @@ function abrirFormPresupuesto(){
     row.innerHTML = `
       <select class="pres-prod-select" style="flex:1;">
         <option value="">Seleccionar producto...</option>
-        ${productos.map(p => `<option value="${p.id}" data-precio="${p.precioMinorista}">${escapeHtml(p.nombre)} - ${formatearMoneda(p.precioMinorista)}</option>`).join("")}
+        ${productos.map(p => { const v = getVarianteDefault(p); return `<option value="${p.id}" data-precio="${v.precioMinorista}">${escapeHtml(p.nombre)} - ${formatearMoneda(v.precioMinorista)}</option>`; }).join("")}
       </select>
       <input type="number" class="pres-prod-cant" value="1" min="1" style="width:50px;">
       <button type="button" class="btn-icono pres-remove-row" style="background:rgba(180,67,46,0.12);color:var(--alerta);">-</button>
@@ -1035,7 +1078,7 @@ function abrirFormPresupuesto(){
       const cant = parseInt(row.querySelector(".pres-prod-cant").value) || 1;
       if (sel.value) {
         const prod = productos.find(p => p.id === sel.value);
-        if (prod) items.push({ id: prod.id, nombre: prod.nombre, precio: prod.precioMinorista, cantidad: cant, subtotal: prod.precioMinorista * cant });
+        if (prod) { const v = getVarianteDefault(prod); items.push({ id: prod.id, nombre: prod.nombre, precio: v.precioMinorista, cantidad: cant, subtotal: v.precioMinorista * cant }); }
       }
     });
     if (items.length === 0) { mostrarToast("Agrega al menos un producto"); return; }

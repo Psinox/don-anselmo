@@ -196,6 +196,24 @@ body.admin-body.dark-mode{
 .pres-producto-row select, .pres-producto-row input{ padding: 8px; border-radius: var(--radius); border: 1.5px solid var(--adm-border-strong); font-size: 0.85rem; background: var(--adm-surface); color: var(--adm-text); }
 .pres-producto-row select:focus, .pres-producto-row input:focus{ outline: none; border-color: var(--adm-heading); }
 
+/* ---------- Variantes (admin form) ---------- */
+.variante-row{ display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+.variante-fields{ display: flex; gap: 6px; flex: 1; flex-wrap: wrap; }
+.variante-fields select,
+.variante-fields input{ padding: 8px; border-radius: var(--radius); border: 1.5px solid var(--adm-border-strong); font-size: 0.85rem; background: var(--adm-surface); color: var(--adm-text); min-width: 0; flex: 1; }
+.variante-fields select:focus,
+.variante-fields input:focus{ outline: none; border-color: var(--adm-heading); }
+.variante-fields select{ flex: 0 0 110px; }
+.variante-fields input[name="v-cantidad"]{ flex: 0 0 70px; }
+.variante-fields input[name="v-precio-min"],
+.variante-fields input[name="v-precio-may"]{ flex: 1; min-width: 90px; }
+
+@media (max-width: 480px){
+  .variante-fields{ gap: 4px; }
+  .variante-fields select{ flex: 0 0 80px; font-size: 0.78rem; }
+  .variante-fields input{ font-size: 0.78rem; }
+}
+
 /* ---------- Mobile optimizations ---------- */
 @media (max-width: 480px){
   .img-upload-grid{ grid-template-columns: repeat(3,1fr); gap: 6px; }

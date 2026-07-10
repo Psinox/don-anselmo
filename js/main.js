@@ -35,7 +35,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function renderLogos(){
   const s = getSettings();
-  if (s.isotipo) document.querySelectorAll(".brand .isotipo").forEach(el => el.src = s.isotipo);
   if (s.logotipo) document.querySelectorAll(".brand .logotipo").forEach(el => el.src = s.logotipo);
   if (s.isologo) document.querySelectorAll("img[src='assets/isologo.svg']").forEach(el => el.src = s.isologo);
 }
@@ -116,7 +115,7 @@ function renderPromos(){
       '<div class="dest-overlay">' +
       '<h3>' + escapeHtml(p.nombre) + '</h3>' +
       '<p>' + escapeHtml(p.descripcion) + '</p>' +
-      '<span class="dest-precio">' + formatearMoneda(p.precioMinorista) + '</span>' +
+      '<span class="dest-precio">' + formatearMoneda(getVarianteDefault(p).precioMinorista) + '</span>' +
       '</div>' +
       '</article>';
   }).join("");
@@ -201,20 +200,31 @@ function renderProductos(){
 
 function bajadaCategoria(catId){
   const textos = {
-    charcuteria: "Escabeches, mermeladas y encurtidos de elaboracion artesanal.",
+    conservas: "Vegetales cosechados en los Esteros, preparados artesanalmente.",
+    mermeladas: "Dulces y agridulces de cosecha propia, coccion lenta a lena.",
     caza: "Nuestra linea premium de escabeches de caza mayor de los Esteros.",
+    charcuteria: "Embutidos y piezas curadas artesanalmente.",
+    panificados: "Panificados y snacks horneados en el dia.",
     recuerdos: "Artesanias y objetos para llevarte un pedazo del Ibera.",
-    grabados: "Piezas de madera y acero grabadas a pedido.",
+    grabados: "Piezas de madera, cuero y metal grabadas a pedido.",
   };
   return textos[catId] || "";
 }
 
+function formatearMedida(v){
+  if (!v) return "";
+  if (v.unidad === "unidad") return v.cantidad === 1 ? "1 unidad" : `${v.cantidad} unidades`;
+  if (v.unidad === "kilogramos") return `${v.cantidad}kg`;
+  return `${v.cantidad}g`;
+}
+
 function tarjetaProducto(p, esMayorista){
   const sinStock = p.sinStock;
-  const precio = esMayorista ? p.precioMayorista : p.precioMinorista;
-  const medida = p.unidad === "unidad" ? "1 unidad" : `${p.cantidad}${p.unidad === "kilogramos" ? "kg" : "g"}`;
+  const norm = normalizarVariantes(p);
+  const variantes = norm.variantes || [];
+  const multi = variantes.length > 1;
   const imagenes = (p.imagenes || []).filter(Boolean);
-  const multi = imagenes.length > 1;
+  const multiImg = imagenes.length > 1;
   return `
     <article class="card-prod cat-${p.categoria}${sinStock ? " sin-stock" : ""}" data-id="${p.id}">
       <div class="foto slider">
@@ -224,7 +234,7 @@ function tarjetaProducto(p, esMayorista){
           ${imagenes.map((img, i) => `<img src="${img}" alt="${escapeHtml(p.nombre)}" class="foto-img" data-idx="${i}" loading="lazy">`).join("")}
           ${imagenes.length === 0 ? `<span class="img-placeholder">${p.nombre.charAt(0)}</span>` : ""}
         </div>
-        ${multi ? `
+        ${multiImg ? `
           <div class="foto-dots">${imagenes.map((_, i) => `<span class="dot${i === 0 ? ' activo' : ''}" data-idx="${i}"></span>`).join("")}</div>
           <button class="foto-arrow prev" data-dir="-1" aria-label="Anterior">&#8249;</button>
           <button class="foto-arrow next" data-dir="1" aria-label="Siguiente">&#8250;</button>
@@ -233,9 +243,15 @@ function tarjetaProducto(p, esMayorista){
       <div class="info">
         <h3>${escapeHtml(p.nombre)}</h3>
         <p class="desc-corta">${escapeHtml(p.descripcion)}</p>
-        <span class="medida">${medida}</span>
+        ${multi ? `
+          <div class="variante-select">
+            <select data-variante-select>
+              ${variantes.map((v, i) => `<option value="${i}">${formatearMedida(v)}</option>`).join("")}
+            </select>
+          </div>
+        ` : `<span class="medida">${formatearMedida(variantes[0])}</span>`}
         <div class="precio-row">
-          <span class="precio">${formatearMoneda(precio)}</span>
+          <span class="precio" data-variante-precio>${formatearMoneda(esMayorista ? variantes[0].precioMayorista : variantes[0].precioMinorista)}</span>
           ${esMayorista ? '<span class="tag-mayorista">Mayorista</span>' : ""}
         </div>
         ${sinStock ? '<p class="sin-stock-msg">Producto sin stock</p>' : `
@@ -251,6 +267,7 @@ function tarjetaProducto(p, esMayorista){
 }
 
 function bindTarjetas(){
+  const productos = getProductos();
   document.querySelectorAll(".card-prod").forEach(card => {
     const id = card.getAttribute("data-id");
     const input = card.querySelector("[data-cant]");
@@ -263,7 +280,9 @@ function bindTarjetas(){
     const btnAgregar = card.querySelector("[data-agregar]");
     btnAgregar.addEventListener("click", () => {
       const cant = Math.max(1, parseInt(input.value || "1"));
-      Carrito.agregar(id, cant);
+      const sel = card.querySelector("[data-variante-select]");
+      const varianteIdx = sel ? parseInt(sel.value) : 0;
+      Carrito.agregar(id, cant, varianteIdx);
       input.value = 1;
       btnAgregar.textContent = "Agregado!";
       btnAgregar.classList.add("agregado");
@@ -271,6 +290,19 @@ function bindTarjetas(){
         btnAgregar.textContent = "Agregar";
         btnAgregar.classList.remove("agregado");
       }, 1100);
+    });
+
+    /* Variant selector */
+    card.querySelectorAll("[data-variante-select]").forEach(sel => {
+      sel.addEventListener("change", () => {
+        const idx = parseInt(sel.value);
+        const variantes = normalizarVariantes(productos.find(x => x.id === card.getAttribute("data-id"))).variantes;
+        const v = variantes[idx];
+        if (!v) return;
+        const esMayorista = !!getMayorista();
+        const precioEl = card.querySelector("[data-variante-precio]");
+        if (precioEl) precioEl.textContent = formatearMoneda(esMayorista ? v.precioMayorista : v.precioMinorista);
+      });
     });
 
     const slider = card.querySelector(".foto.slider");
@@ -368,11 +400,11 @@ function renderCarrito(){
     cont.innerHTML = '<div class="carrito-vacio"><p>Todavia no agregaste productos.</p></div>';
   } else {
     cont.innerHTML = detalle.map(l => `
-      <div class="item-carrito" data-id="${l.producto.id}">
+      <div class="item-carrito" data-id="${l.producto.id}" data-variante="${l.varianteIdx}">
         <div class="foto-mini">${l.producto.imagenes && l.producto.imagenes[0] ? `<img src="${l.producto.imagenes[0]}" alt="">` : l.producto.nombre.charAt(0)}</div>
         <div class="datos">
           <h4>${escapeHtml(l.producto.nombre)}</h4>
-          <span class="medida">${l.producto.unidad === "unidad" ? "1 unidad" : (l.producto.cantidad + (l.producto.unidad === "kilogramos" ? "kg" : "g"))} x${l.cantidad}</span>
+          <span class="medida">${l.variante ? formatearMedida(l.variante) + " x" : ""}${l.cantidad}</span>
           <div class="fila-precio">
             <strong>${formatearMoneda(l.subtotal)}</strong>
             <button type="button" class="quitar" data-quitar>Quitar</button>
@@ -383,8 +415,10 @@ function renderCarrito(){
 
     cont.querySelectorAll("[data-quitar]").forEach(btn => {
       btn.addEventListener("click", (e) => {
-        const id = e.target.closest(".item-carrito").getAttribute("data-id");
-        Carrito.quitar(id);
+        const item = e.target.closest(".item-carrito");
+        const id = item.getAttribute("data-id");
+        const vi = parseInt(item.getAttribute("data-variante")) || 0;
+        Carrito.quitar(id, vi);
       });
     });
   }

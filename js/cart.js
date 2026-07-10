@@ -6,33 +6,33 @@ const Carrito = {
     this.renderBadge();
   },
 
-  _buscarLinea(productoId){
-    return this.items.find(i => i.productoId === productoId);
+  _buscarLinea(productoId, varianteIdx = 0){
+    return this.items.find(i => i.productoId === productoId && i.varianteIdx === varianteIdx);
   },
 
-  agregar(productoId, cantidad = 1){
-    const linea = this._buscarLinea(productoId);
+  agregar(productoId, cantidad = 1, varianteIdx = 0){
+    const linea = this._buscarLinea(productoId, varianteIdx);
     if (linea) {
       linea.cantidad += cantidad;
     } else {
-      this.items.push({ productoId, cantidad });
+      this.items.push({ productoId, varianteIdx, cantidad });
     }
     this._persistir();
   },
 
-  actualizarCantidad(productoId, cantidad){
-    const linea = this._buscarLinea(productoId);
+  actualizarCantidad(productoId, cantidad, varianteIdx = 0){
+    const linea = this._buscarLinea(productoId, varianteIdx);
     if (!linea) return;
     if (cantidad <= 0){
-      this.quitar(productoId);
+      this.quitar(productoId, varianteIdx);
       return;
     }
     linea.cantidad = cantidad;
     this._persistir();
   },
 
-  quitar(productoId){
-    this.items = this.items.filter(i => i.productoId !== productoId);
+  quitar(productoId, varianteIdx = 0){
+    this.items = this.items.filter(i => !(i.productoId === productoId && i.varianteIdx === varianteIdx));
     this._persistir();
   },
 
@@ -51,9 +51,13 @@ const Carrito = {
     return this.items.map(i => {
       const prod = productos.find(p => p.id === i.productoId);
       if (!prod) return null;
-      const precioUnit = esMayorista ? prod.precioMayorista : prod.precioMinorista;
+      const norm = normalizarVariantes(prod);
+      const variante = norm.variantes[i.varianteIdx || 0] || norm.variantes[0];
+      const precioUnit = esMayorista ? variante.precioMayorista : variante.precioMinorista;
       return {
         producto: prod,
+        variante: variante,
+        varianteIdx: i.varianteIdx || 0,
         cantidad: i.cantidad,
         precioUnit,
         subtotal: precioUnit * i.cantidad,
@@ -97,10 +101,9 @@ function construirMensajeWhatsapp(){
 
   let msg = `Hola ${settings.nombreNegocio}! Quiero hacer un pedido:\n\n`;
   detalle.forEach(l => {
-    const medida = l.producto.unidad === "unidad"
-      ? `x${l.cantidad}`
-      : `x${l.cantidad} (${l.producto.cantidad}${l.producto.unidad === "kilogramos" ? "kg" : "g"} c/u)`;
-    msg += `- ${l.producto.nombre} ${medida} -- ${formatearMoneda(l.subtotal)}\n`;
+    const v = l.variante;
+    const medidaStr = v ? ` (${formatearMedida(v)})` : "";
+    msg += `- ${l.producto.nombre}${medidaStr} x${l.cantidad} -- ${formatearMoneda(l.subtotal)}\n`;
   });
   msg += `\nTOTAL: ${formatearMoneda(Carrito.total())}`;
   if (mayorista){
@@ -124,6 +127,7 @@ function irAWhatsapp(){
     const detalle = Carrito.detalle();
     const items = detalle.map(l => ({
       producto: { nombre: l.producto.nombre, id: l.producto.id },
+      variante: l.variante ? { unidad: l.variante.unidad, cantidad: l.variante.cantidad } : null,
       cantidad: l.cantidad,
       precio: l.precioUnit,
       subtotal: l.subtotal,
