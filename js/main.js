@@ -53,7 +53,6 @@ function renderHero(){
   content.style.zIndex = "";
 
   content.innerHTML = `
-    <img class="hero-logo" src="assets/isotipo.svg" alt="">
     <img class="hero-logotipo" src="assets/logotipo.svg" alt="Don Anselmo">
     <p class="subt">${escapeHtml(s.heroSubtitulo || "Esteros del Ibera · Corrientes")}</p>
     <p class="desc">${escapeHtml(s.eslogan)}</p>
