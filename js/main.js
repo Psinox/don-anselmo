@@ -209,13 +209,6 @@ function bajadaCategoria(catId){
   return textos[catId] || "";
 }
 
-function formatearMedida(v){
-  if (!v) return "";
-  if (v.unidad === "unidad") return v.cantidad === 1 ? "1 unidad" : `${v.cantidad} unidades`;
-  if (v.unidad === "kilogramos") return `${v.cantidad}kg`;
-  return `${v.cantidad}g`;
-}
-
 function tarjetaProducto(p, esMayorista){
   const sinStock = p.sinStock;
   const norm = normalizarVariantes(p);

@@ -91,6 +91,13 @@ function formatearMoneda(valor){
   return settings.moneda + " " + Number(valor).toLocaleString("es-AR");
 }
 
+function formatearMedida(v){
+  if (!v) return "";
+  if (v.unidad === "unidad") return v.cantidad === 1 ? "1 unidad" : `${v.cantidad} unidades`;
+  if (v.unidad === "kilogramos") return `${v.cantidad}kg`;
+  return `${v.cantidad}g`;
+}
+
 function construirMensajeWhatsapp(){
   const settings = getSettings();
   const mayorista = getMayorista();
