@@ -1106,7 +1106,7 @@ function mostrarPresupuesto(idx){
   const html = `
     <div style="background:#fff;border-radius:var(--radius-lg);padding:24px;max-width:600px;margin:20px auto;">
       <div style="text-align:center;margin-bottom:20px;">
-        <img src="assets/isologo.svg" style="height:50px;">
+        <img src="assets/logotipo.svg" style="height:50px;">
         <h2 style="font-family:var(--f-script);color:var(--dorado-claro);font-size:2rem;margin:8px 0;">Don Anselmo</h2>
         <p style="color:#8a7a63;font-size:0.85rem;">Presupuesto #${idx+1} · ${pr.fecha}</p>
       </div>

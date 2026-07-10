@@ -80,7 +80,6 @@ function renderHero(){
     }
   }
 
-  if (s.isotipo) content.querySelector(".hero-logo").src = s.isotipo;
   if (s.logotipo) content.querySelector(".hero-logotipo").src = s.logotipo;
 }
 
