@@ -1,3 +1,5 @@
+window.__DON_ANSELMO_API_KEY = "dna-2026-K7xP9mQ2vL45zRw8-anselmo";
+
 const ADMIN_PASSWORD_DEFAULT = "donanselmo2026";
 const ADMIN_PASS_KEY = "donanselmo_admin_pass";
 const SESSION_KEY = "donanselmo_admin_sesion";
@@ -130,20 +132,45 @@ function escapeHtml(str){
 const CLOUD_NAME = "dmdpzjwom";
 const UPLOAD_PRESET = "don-anselmo";
 
+async function comprimirImagen(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      let w = img.naturalWidth;
+      let h = img.naturalHeight;
+      const MAX = 1200;
+      if (w > MAX || h > MAX) {
+        if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+        else { w = Math.round(w * MAX / h); h = MAX; }
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, w, h);
+      canvas.toBlob(blob => resolve(blob), "image/webp", 0.8);
+    };
+    img.onerror = reject;
+    img.src = URL.createObjectURL(file);
+  });
+}
+
 function subirImgCloudinary(file, cb){
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("upload_preset", UPLOAD_PRESET);
-  formData.append("folder", "don-anselmo");
-  fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
-    method: "POST", body: formData,
-  })
-    .then(r => r.json())
-    .then(res => {
-      if (res.secure_url) cb(null, res.secure_url);
-      else cb("Error al subir imagen: " + (res.error?.message || "desconocido"));
+  comprimirImagen(file).then(blob => {
+    const formData = new FormData();
+    formData.append("file", blob, "imagen.webp");
+    formData.append("upload_preset", UPLOAD_PRESET);
+    formData.append("folder", "don-anselmo");
+    fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
+      method: "POST", body: formData,
     })
-    .catch(err => cb("Error de red al subir imagen"));
+      .then(r => r.json())
+      .then(res => {
+        if (res.secure_url) cb(null, res.secure_url.replace("/upload/", "/upload/f_auto,q_auto/"));
+        else cb("Error al subir imagen: " + (res.error?.message || "desconocido"));
+      })
+      .catch(err => cb("Error de red al subir imagen"));
+  }).catch(err => cb("Error al comprimir imagen: " + (err.message || err)));
 }
 
 /* =========================================================================

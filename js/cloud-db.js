@@ -6,7 +6,6 @@
    ========================================================================= */
 
 const CLOUD_URL = "https://don-anselmo-api.kivaro-dev.workers.dev";
-const CLOUD_API_KEY = "dna-2026-K7xP9mQ2vL45zRw8-anselmo"; // debe ser IGUAL en worker.js
 
 const CACHE_KEY = "donanselmo_cloud_cache";
 
@@ -27,12 +26,20 @@ function _writeCache(data) {
   try { localStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch {}
 }
 
+function _getWriteKey() {
+  return window.__DON_ANSELMO_API_KEY || "";
+}
+
 async function _fetch(method, path, body) {
   const opts = {
     method,
-    headers: { "X-Api-Key": CLOUD_API_KEY },
+    headers: {},
     signal: AbortSignal.timeout(5000),
   };
+  if (method === "POST") {
+    const key = _getWriteKey();
+    if (key) opts.headers["X-Api-Key"] = key;
+  }
   if (body) {
     opts.headers["Content-Type"] = "application/json";
     opts.body = JSON.stringify(body);

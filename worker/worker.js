@@ -4,7 +4,7 @@
 // Guarda TODO el negocio en una sola key del KV.
 // =============================================
 
-const API_SECRET = "dna-2026-K7xP9mQ2vL45zRw8-anselmo"; // debe ser IGUAL en cloud-db.js
+const API_SECRET = "dna-2026-K7xP9mQ2vL45zRw8-anselmo";
 
 const KV_KEY = "main";
 
@@ -16,7 +16,8 @@ const ALLOWED_ORIGINS = [
 ];
 
 function withCors(resp, origin) {
-  resp.headers.set("Access-Control-Allow-Origin", ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0]);
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  resp.headers.set("Access-Control-Allow-Origin", allowed);
   resp.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   resp.headers.set("Access-Control-Allow-Headers", "Content-Type, X-Api-Key");
   return resp;

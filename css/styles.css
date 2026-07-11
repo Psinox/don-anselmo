@@ -227,6 +227,30 @@ h1,h2,h3,h4{ font-family: var(--f-display); margin: 0; }
 }
 @media (min-width: 641px) and (max-width: 980px){ .promos-track{ grid-template-columns: repeat(2, 1fr); } }
 
+/* ---------- Skeleton loaders ---------- */
+.skeleton-card {
+  background: var(--crema-2);
+  border: 1px solid rgba(107,68,35,0.1);
+  border-radius: var(--radius-lg);
+  min-height: 250px;
+  position: relative;
+  overflow: hidden;
+}
+.skeleton-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  animation: shimmer 1.5s infinite;
+}
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+.promos-track .skeleton-card{ min-height: 220px; }
+#productos-cont .skeleton-card{ min-height: 280px; margin-bottom: 16px; }
+#productos-cont .skeleton-card:last-child{ margin-bottom: 0; }
+
 .dest-card{
   position: relative; border-radius: var(--radius-lg); overflow: hidden;
   cursor: pointer; aspect-ratio: 4/3;

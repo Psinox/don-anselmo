@@ -98,6 +98,7 @@ function renderTextosNegocio(){
 function renderPromos(){
   const cont = document.getElementById("promos-track");
   if (!cont) return;
+  cont.innerHTML = "";
   const s = getSettings();
   const productos = getProductos().filter(p => p.activo);
   const destacados = (s.productosDestacados || []).map(id => productos.find(p => p.id === id)).filter(Boolean);
@@ -169,6 +170,7 @@ function irACategoria(catId){
 function renderProductos(){
   const cont = document.getElementById("productos-cont");
   if (!cont) return;
+  cont.innerHTML = "";
   const productos = getProductos().filter(p => p.activo);
   const esMayorista = !!getMayorista();
 
